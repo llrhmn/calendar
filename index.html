@@ -1,0 +1,2905 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📅 تقويم AhmdSchool</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700;900&family=Cairo:wght@400;600;700;900&family=Reem+Kufi:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+:root {
+  --paper: #fdfbf5;
+  --paper-dark: #f5f0e3;
+  --paper-line: #e8e0cc;
+  --paper-line-red: #f0c8c8;
+  --ink: #2a2118;
+  --ink-light: #6b5d4a;
+  --ink-muted: #a09580;
+  --gold: #b8945f;
+  --gold-dark: #8a6b3a;
+  --red: #c0392b;
+  --blue: #2c5aa0;
+  --green: #3d7c5c;
+  --shadow-paper: 0 20px 60px rgba(0,0,0,0.15), 0 4px 12px rgba(0,0,0,0.08);
+  --shadow-soft: 0 4px 15px rgba(0,0,0,0.08);
+  --font-title: 'Amiri', serif;
+  --font-body: 'Cairo', sans-serif;
+  --font-accent: 'Reem Kufi', sans-serif;
+}
+body.dark-mode {
+  --paper: #1e1a14;
+  --paper-dark: #15120d;
+  --paper-line: #2e2820;
+  --paper-line-red: #4a2a2a;
+  --ink: #ebe0cc;
+  --ink-light: #b8a888;
+  --ink-muted: #7a6f5a;
+  --shadow-paper: 0 20px 60px rgba(0,0,0,0.5), 0 4px 12px rgba(0,0,0,0.3);
+  --shadow-soft: 0 4px 15px rgba(0,0,0,0.3);
+}
+html, body {
+  min-height: 100vh;
+  font-family: var(--font-body);
+  color: var(--ink);
+  background: linear-gradient(135deg, #f5efe0 0%, #e8dfc8 100%);
+  transition: background 0.4s, color 0.3s;
+  overflow-x: hidden;
+}
+body.dark-mode { background: linear-gradient(135deg, #0a0806 0%, #15120d 100%); }
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(184,148,95,0.06) 0%, transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(184,148,95,0.06) 0%, transparent 40%);
+  pointer-events: none;
+  z-index: 0;
+}
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--paper);
+  backdrop-filter: blur(15px);
+  border-bottom: 2px solid var(--gold);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  padding: 12px 20px;
+}
+.topbar-inner {
+  max-width: 1500px; margin: 0 auto;
+  display: flex; gap: 12px; flex-wrap: wrap;
+  align-items: center; justify-content: space-between;
+}
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand-icon {
+  width: 42px; height: 42px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-size: 1.4rem;
+  box-shadow: 0 4px 12px rgba(184,148,95,0.4);
+}
+.brand-text { display: flex; flex-direction: column; line-height: 1.1; }
+.brand-name { font-family: var(--font-title); font-size: 1.15rem; font-weight: 900; color: var(--ink); }
+.brand-sub { font-size: 0.72rem; color: var(--ink-muted); letter-spacing: 1px; }
+.topbar-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.icon-btn {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  border: 1.5px solid var(--paper-line);
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 1.05rem;
+  cursor: pointer;
+  transition: all 0.25s;
+  display: flex; align-items: center; justify-content: center;
+}
+.icon-btn:hover { border-color: var(--gold); transform: translateY(-2px); box-shadow: 0 6px 15px rgba(184,148,95,0.25); }
+.clock-bar {
+  max-width: 1500px; margin: 15px auto 0;
+  padding: 0 20px;
+  display: flex; gap: 12px; flex-wrap: wrap;
+  position: relative; z-index: 1;
+}
+.clock-card {
+  flex: 1; min-width: 250px;
+  background: var(--paper);
+  border-radius: 16px;
+  padding: 18px 22px;
+  box-shadow: var(--shadow-paper);
+  border: 1px solid var(--paper-line);
+  display: flex; align-items: center; gap: 15px;
+  position: relative; overflow: hidden;
+}
+.clock-card::before {
+  content: '';
+  position: absolute; top: 0; right: 0; bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, var(--gold), var(--gold-dark));
+}
+.clock-icon {
+  width: 50px; height: 50px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem; color: white;
+  flex-shrink: 0;
+}
+.clock-content { flex: 1; }
+.clock-time {
+  font-family: var(--font-title);
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-weight: 900;
+  color: var(--ink);
+  direction: ltr;
+  text-align: right;
+}
+.clock-time .period {
+  font-size: 0.55em;
+  color: var(--ink-light);
+  font-family: var(--font-accent);
+  margin-right: 8px;
+}
+.clock-date {
+  font-family: var(--font-accent);
+  font-size: 0.9rem;
+  color: var(--ink-light);
+  margin-top: 4px;
+}
+.clock-hijri {
+  font-family: var(--font-title);
+  font-size: 0.85rem;
+  color: var(--gold-dark);
+  margin-top: 2px;
+}
+.search-bar {
+  max-width: 1500px; margin: 12px auto 0;
+  padding: 0 20px;
+  position: relative; z-index: 1;
+}
+.search-wrap {
+  position: relative;
+  background: var(--paper);
+  border-radius: 14px;
+  border: 1.5px solid var(--paper-line);
+  box-shadow: var(--shadow-soft);
+  transition: all 0.3s;
+}
+.search-wrap:focus-within {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 4px rgba(184,148,95,0.15), var(--shadow-soft);
+}
+.search-input {
+  width: 100%;
+  padding: 14px 50px 14px 18px;
+  border: none;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  border-radius: 14px;
+}
+.search-input:focus { outline: none; }
+.search-input::placeholder { color: var(--ink-muted); }
+.search-icon {
+  position: absolute; right: 18px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--gold-dark);
+  font-size: 1.1rem;
+  pointer-events: none;
+}
+.search-results {
+  display: none;
+  background: var(--paper);
+  border-radius: 14px;
+  margin-top: 8px;
+  border: 1px solid var(--paper-line);
+  box-shadow: var(--shadow-paper);
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 10px;
+}
+.search-results.show { display: block; }
+.search-result-item {
+  padding: 12px 15px;
+  border-radius: 10px;
+  border-bottom: 1px solid var(--paper-line);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.search-result-item:last-child { border-bottom: none; }
+.search-result-item:hover { background: var(--paper-dark); transform: translateX(-3px); }
+.search-result-item .sr-title { font-weight: 700; color: var(--ink); font-size: 0.9rem; margin-bottom: 3px; }
+.search-result-item .sr-meta { font-size: 0.75rem; color: var(--ink-muted); }
+.search-result-item .sr-type {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  margin-left: 6px;
+}
+.search-result-item .sr-type.note { background: rgba(44,90,160,0.15); color: var(--blue); }
+.search-result-item .sr-type.birthday { background: rgba(192,57,43,0.15); color: var(--red); }
+.search-empty { padding: 30px; text-align: center; color: var(--ink-muted); font-size: 0.9rem; }
+.tabs-bar {
+  max-width: 1500px; margin: 15px auto 0;
+  padding: 0 20px;
+  position: relative; z-index: 1;
+}
+.tabs {
+  display: flex; gap: 6px;
+  background: var(--paper);
+  padding: 6px;
+  border-radius: 16px;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--paper-line);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab-btn {
+  flex: 1;
+  min-width: 130px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  border: none;
+  background: transparent;
+  color: var(--ink-light);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.25s;
+  white-space: nowrap;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.tab-btn:hover { color: var(--ink); background: var(--paper-dark); }
+.tab-btn.active {
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  color: white;
+  box-shadow: 0 6px 15px rgba(184,148,95,0.35);
+}
+.container {
+  max-width: 1500px; margin: 20px auto 0;
+  padding: 0 20px 40px;
+  position: relative; z-index: 1;
+}
+.tab-pane { display: none; animation: fadeIn 0.4s ease; }
+.tab-pane.active { display: block; }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.calendar-controls {
+  display: flex; gap: 10px; flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 20px;
+  align-items: center;
+}
+.nav-btn {
+  padding: 10px 18px;
+  border-radius: 12px;
+  border: 1.5px solid var(--paper-line);
+  background: var(--paper);
+  color: var(--ink);
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.25s;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.nav-btn:hover { border-color: var(--gold); transform: translateY(-2px); box-shadow: 0 6px 15px rgba(184,148,95,0.25); }
+.date-display {
+  padding: 10px 24px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  color: white;
+  font-family: var(--font-title);
+  font-weight: 900;
+  font-size: 1rem;
+  box-shadow: 0 6px 15px rgba(184,148,95,0.35);
+}
+.calendar-book {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+@media (min-width: 1000px) {
+  .calendar-book {
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    position: relative;
+  }
+  .calendar-book::after {
+    content: '';
+    position: absolute;
+    top: 20px; bottom: 20px;
+    right: 50%;
+    width: 2px;
+    background: linear-gradient(180deg, transparent, var(--gold), transparent);
+    transform: translateX(50%);
+    z-index: 5;
+    box-shadow: 0 0 20px rgba(184,148,95,0.5);
+  }
+}
+.page {
+  background: var(--paper);
+  border-radius: 8px;
+  padding: 30px 25px;
+  box-shadow: var(--shadow-paper);
+  border: 1px solid var(--paper-line);
+  position: relative;
+  overflow: hidden;
+  min-height: 700px;
+}
+.page::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(180deg,
+      transparent 0px, transparent 35px,
+      var(--paper-line) 35px, var(--paper-line) 36px);
+  pointer-events: none;
+  opacity: 0.5;
+}
+.page::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  right: 60px;
+  width: 1px;
+  background: var(--paper-line-red);
+  opacity: 0.6;
+  pointer-events: none;
+}
+@media (min-width: 1000px) {
+  .page.day-page {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    box-shadow: -8px 0 30px rgba(0,0,0,0.08), var(--shadow-paper);
+  }
+  .page.night-page {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    box-shadow: 8px 0 30px rgba(0,0,0,0.08), var(--shadow-paper);
+  }
+}
+.page-header {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid var(--gold);
+}
+.page-header .page-day-name {
+  font-family: var(--font-title);
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-weight: 900;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.page-header .page-date { font-family: var(--font-accent); font-size: 0.9rem; color: var(--ink-light); }
+.page-header .page-period {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+.page-header .page-period.day { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: white; }
+.page-header .page-period.night { background: linear-gradient(135deg, #1e3a8a, #312e81); color: white; }
+.hours-list { position: relative; z-index: 2; }
+.hour-row {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  min-height: 42px;
+  padding: 4px 0;
+  border-bottom: 1px dashed var(--paper-line);
+  position: relative;
+}
+.hour-row:last-child { border-bottom: none; }
+.hour-label {
+  width: 65px;
+  flex-shrink: 0;
+  font-family: var(--font-accent);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--gold-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--paper-dark);
+  border-radius: 8px;
+  direction: ltr;
+}
+.hour-label.current {
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  color: white;
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(184,148,95,0.5); }
+  50% { box-shadow: 0 0 0 6px rgba(184,148,95,0); }
+}
+.hour-note {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  border-radius: 8px;
+  resize: none;
+  line-height: 1.4;
+}
+.hour-note::placeholder { color: var(--ink-muted); font-style: italic; font-size: 0.82rem; }
+.hour-note:focus { outline: none; background: rgba(184,148,95,0.1); box-shadow: 0 0 0 2px var(--gold); }
+.hour-note.has-content { font-weight: 600; }
+.page-footer {
+  position: relative;
+  z-index: 2;
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 2px solid var(--gold);
+}
+.quick-note-label { font-size: 0.78rem; color: var(--ink-muted); margin-bottom: 6px; font-weight: 700; }
+.quick-note {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--paper-line);
+  background: var(--paper-dark);
+  border-radius: 10px;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  resize: vertical;
+  min-height: 60px;
+}
+.quick-note:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(184,148,95,0.15); }
+.birthday-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+@media (min-width: 900px) { .birthday-layout { grid-template-columns: 380px 1fr; } }
+.card-panel {
+  background: var(--paper);
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: var(--shadow-paper);
+  border: 1px solid var(--paper-line);
+}
+.panel-title {
+  font-family: var(--font-title);
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: var(--ink);
+  margin-bottom: 15px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--gold);
+  display: flex; align-items: center; gap: 8px;
+}
+.form-group { margin-bottom: 15px; }
+.form-label { display: block; font-weight: 700; font-size: 0.85rem; color: var(--ink-light); margin-bottom: 6px; }
+.form-input, .form-select {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1.5px solid var(--paper-line);
+  background: var(--paper-dark);
+  border-radius: 10px;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 0.9rem;
+}
+.form-input:focus, .form-select:focus {
+  outline: none;
+  border-color: var(--gold);
+  background: var(--paper);
+  box-shadow: 0 0 0 3px rgba(184,148,95,0.15);
+}
+.btn {
+  padding: 12px 20px;
+  border-radius: 10px;
+  border: none;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.25s;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  color: white;
+  box-shadow: 0 6px 15px rgba(184,148,95,0.35);
+  width: 100%;
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(184,148,95,0.5); }
+.btn-secondary {
+  background: var(--paper-dark);
+  color: var(--ink);
+  border: 1.5px solid var(--paper-line);
+}
+.btn-secondary:hover { border-color: var(--gold); transform: translateY(-2px); }
+.birthday-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+  margin-top: 15px;
+}
+.birthday-card {
+  background: var(--paper-dark);
+  border-radius: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--paper-line);
+  position: relative;
+}
+.birthday-card:hover { transform: translateY(-3px); border-color: var(--gold); }
+.birthday-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.birthday-avatar {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-size: 1.2rem; font-weight: 900;
+  flex-shrink: 0;
+}
+.birthday-name { font-weight: 900; color: var(--ink); font-size: 0.95rem; }
+.birthday-date { font-size: 0.8rem; color: var(--ink-light); }
+.birthday-details { display: flex; gap: 8px; flex-wrap: wrap; font-size: 0.78rem; margin-top: 8px; }
+.birthday-badge {
+  padding: 3px 10px;
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--ink-light);
+  font-weight: 700;
+  border: 1px solid var(--paper-line);
+}
+.birthday-badge.today {
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  color: white;
+  border-color: transparent;
+}
+.birthday-badge.today::before { content: '🎂 '; }
+.birthday-delete {
+  position: absolute;
+  top: 8px; left: 8px;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: var(--red);
+  color: white;
+  border: none;
+  font-size: 0.75rem;
+  cursor: pointer;
+  opacity: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.birthday-card:hover .birthday-delete { opacity: 1; }
+.agri-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+.agri-card {
+  background: var(--paper);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: var(--shadow-paper);
+  border: 1px solid var(--paper-line);
+  border-top: 4px solid var(--gold);
+  position: relative;
+}
+.agri-card.current { border-top-color: var(--red); box-shadow: 0 15px 35px rgba(192,57,43,0.2); }
+.agri-card.current::before {
+  content: '📌 اليوم';
+  position: absolute;
+  top: 10px; left: 10px;
+  background: linear-gradient(135deg, var(--red), #8b1a1a);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 900;
+}
+.agri-emoji { font-size: 2.5rem; margin-bottom: 10px; display: block; text-align: center; }
+.agri-name { font-family: var(--font-title); font-size: 1.3rem; font-weight: 900; color: var(--ink); text-align: center; margin-bottom: 6px; }
+.agri-period { text-align: center; font-size: 0.8rem; color: var(--ink-muted); margin-bottom: 10px; direction: ltr; }
+.agri-desc {
+  font-size: 0.85rem;
+  color: var(--ink-light);
+  line-height: 1.7;
+  padding-top: 10px;
+  border-top: 1px dashed var(--paper-line);
+}
+.agri-crops { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px; }
+.agri-crop {
+  font-size: 0.72rem;
+  padding: 3px 8px;
+  background: rgba(184,148,95,0.1);
+  border: 1px solid rgba(184,148,95,0.3);
+  border-radius: 8px;
+  color: var(--ink-light);
+  font-weight: 700;
+}
+.agri-season {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  margin-top: 8px;
+}
+.astro-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.astro-card {
+  background: var(--paper);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--paper-line);
+  display: flex; align-items: center; gap: 14px;
+}
+.astro-card:hover { transform: translateY(-3px); border-color: var(--gold); }
+.astro-icon {
+  width: 52px; height: 52px;
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem;
+  flex-shrink: 0;
+}
+.astro-icon.sun { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+.astro-icon.moon { background: linear-gradient(135deg, #6366f1, #312e81); }
+.astro-icon.star { background: linear-gradient(135deg, #8b5cf6, #4c1d95); }
+.astro-icon.planet { background: linear-gradient(135deg, #ec4899, #9d174d); }
+.astro-icon.eclipse { background: linear-gradient(135deg, #dc2626, #7f1d1d); }
+.astro-content { flex: 1; min-width: 0; }
+.astro-label { font-size: 0.78rem; color: var(--ink-muted); font-weight: 700; margin-bottom: 3px; }
+.astro-value {
+  font-family: var(--font-accent);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--ink);
+  direction: ltr;
+  text-align: right;
+}
+.events-list {
+  background: var(--paper);
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: var(--shadow-paper);
+  border: 1px solid var(--paper-line);
+}
+.event-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px dashed var(--paper-line);
+}
+.event-item:last-child { border-bottom: none; }
+.event-time {
+  padding: 6px 12px;
+  border-radius: 10px;
+  background: var(--paper-dark);
+  font-family: var(--font-accent);
+  font-weight: 700;
+  color: var(--gold-dark);
+  font-size: 0.8rem;
+  direction: ltr;
+  flex-shrink: 0;
+}
+.event-content { flex: 1; }
+.event-title { font-weight: 900; color: var(--ink); font-size: 0.95rem; margin-bottom: 3px; }
+.event-desc { font-size: 0.82rem; color: var(--ink-light); line-height: 1.6; }
+.daynight-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+@media (min-width: 900px) { .daynight-layout { grid-template-columns: 1fr 1fr; } }
+.sky-diagram {
+  background: linear-gradient(180deg, #1a2456 0%, #4a3a7a 50%, #c4885c 100%);
+  border-radius: 20px;
+  padding: 30px;
+  min-height: 400px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-paper);
+  border: 1px solid var(--paper-line);
+}
+body.dark-mode .sky-diagram { background: linear-gradient(180deg, #0a0820 0%, #1a1040 50%, #2a1840 100%); }
+.sky-diagram .stars {
+  position: absolute; inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 10% 20%, white, transparent),
+    radial-gradient(1px 1px at 30% 15%, white, transparent),
+    radial-gradient(1px 1px at 50% 25%, white, transparent),
+    radial-gradient(1px 1px at 70% 10%, white, transparent),
+    radial-gradient(1px 1px at 85% 30%, white, transparent),
+    radial-gradient(1px 1px at 15% 40%, white, transparent);
+  opacity: 0.6;
+}
+.sky-arc {
+  position: absolute;
+  top: 0; left: 50%;
+  width: 90%;
+  height: 100%;
+  transform: translateX(-50%);
+  border-radius: 50% 50% 0 0;
+  border: 2px dashed rgba(255,255,255,0.25);
+  border-bottom: none;
+}
+.sun-orb {
+  position: absolute;
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fff8c0, #fbbf24, #f59e0b);
+  box-shadow: 0 0 30px rgba(251,191,36,0.9), 0 0 60px rgba(251,191,36,0.5);
+  transition: all 1s ease;
+  z-index: 3;
+}
+.moon-orb {
+  position: absolute;
+  width: 45px; height: 45px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ffffff, #e8e8f0, #b8b8c8);
+  box-shadow: 0 0 25px rgba(200,200,255,0.7);
+  transition: all 1s ease;
+  z-index: 3;
+}
+.sky-horizon {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 60px;
+  background: linear-gradient(0deg, rgba(0,0,0,0.5), transparent);
+}
+.sky-label {
+  position: absolute;
+  color: white;
+  font-family: var(--font-accent);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  background: rgba(0,0,0,0.4);
+  border-radius: 8px;
+  backdrop-filter: blur(6px);
+}
+.sky-label.east { top: 20px; left: 15px; }
+.sky-label.south { top: 15px; left: 50%; transform: translateX(-50%); }
+.sky-label.west { top: 20px; right: 15px; }
+.daynight-info { display: flex; flex-direction: column; gap: 15px; }
+.info-card {
+  background: var(--paper);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--paper-line);
+  display: flex; align-items: center; gap: 15px;
+}
+.info-card .info-icon {
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+.info-card .info-icon.sunrise { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+.info-card .info-icon.sunset { background: linear-gradient(135deg, #f59e0b, #dc2626); }
+.info-card .info-icon.day-length { background: linear-gradient(135deg, #fcd34d, #f97316); }
+.info-card .info-icon.night-length { background: linear-gradient(135deg, #6366f1, #1e1b4b); }
+.info-card .info-content { flex: 1; }
+.info-card .info-label { font-size: 0.78rem; color: var(--ink-muted); font-weight: 700; margin-bottom: 3px; }
+.info-card .info-value {
+  font-family: var(--font-accent);
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: var(--ink);
+  direction: ltr;
+  text-align: right;
+}
+.day-progress-bar {
+  background: var(--paper);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--paper-line);
+  margin-top: 15px;
+}
+.day-progress-label {
+  font-size: 0.82rem;
+  color: var(--ink-muted);
+  font-weight: 700;
+  margin-bottom: 10px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.day-progress-track {
+  height: 24px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #1e3a8a 0%, #1e3a8a 25%, #fbbf24 25%, #fbbf24 75%, #1e3a8a 75%);
+  position: relative;
+  overflow: hidden;
+}
+.day-progress-track::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(90deg,
+    transparent 0px, transparent 24px,
+    rgba(255,255,255,0.15) 24px, rgba(255,255,255,0.15) 25px);
+}
+.day-progress-handle {
+  position: absolute;
+  top: -4px; bottom: -4px;
+  width: 4px;
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(255,255,255,0.8), 0 2px 6px rgba(0,0,0,0.3);
+  transition: left 1s ease;
+  z-index: 2;
+}
+.day-progress-handle::after {
+  content: '☀️';
+  position: absolute;
+  top: -22px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 1rem;
+}
+.day-progress-marks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: var(--ink-muted);
+  margin-top: 6px;
+  direction: ltr;
+}
+
+/* مواقيت الصلاة */
+.auto-location-banner {
+  background: linear-gradient(135deg, #0d2a1e 0%, #1a4d3a 50%, #0d2a1e 100%);
+  border-radius: 20px;
+  padding: 24px 28px;
+  color: white;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-paper);
+  text-align: center;
+}
+.auto-location-banner::before {
+  content: '🕌';
+  position: absolute;
+  top: -20px; left: -20px;
+  font-size: 12rem;
+  opacity: 0.05;
+}
+.auto-location-content { position: relative; z-index: 2; }
+.auto-location-city {
+  font-family: var(--font-title);
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 900;
+  margin-bottom: 6px;
+  color: #fbbf24;
+  text-shadow: 0 0 20px rgba(251,191,36,0.4);
+}
+.auto-location-date {
+  font-family: var(--font-accent);
+  font-size: 0.95rem;
+  opacity: 0.85;
+  margin-bottom: 12px;
+}
+.auto-location-status {
+  display: inline-block;
+  padding: 8px 20px;
+  border-radius: 20px;
+  background: rgba(251,191,36,0.15);
+  color: #fbbf24;
+  font-weight: 700;
+  font-size: 0.85rem;
+  border: 1px solid rgba(251,191,36,0.3);
+}
+.auto-location-status.granted {
+  background: rgba(16,185,129,0.15);
+  color: #6ee7b7;
+  border-color: rgba(16,185,129,0.4);
+}
+.auto-location-status.denied {
+  background: rgba(239,68,68,0.15);
+  color: #fca5a5;
+  border-color: rgba(239,68,68,0.4);
+}
+.prayer-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.prayer-card {
+  background: var(--paper);
+  border-radius: 16px;
+  padding: 20px 18px;
+  box-shadow: var(--shadow-soft);
+  border: 1.5px solid var(--paper-line);
+  display: flex; align-items: center; gap: 14px;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+.prayer-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-paper);
+  border-color: var(--gold);
+}
+.prayer-card.next {
+  border-color: var(--gold);
+  border-width: 2px;
+  background: linear-gradient(135deg, rgba(184,148,95,0.08), rgba(184,148,95,0.02));
+  box-shadow: 0 10px 30px rgba(184,148,95,0.25);
+}
+.prayer-card.next::after {
+  content: '⭐ القادمة';
+  position: absolute;
+  top: 6px; left: 6px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  color: white;
+  padding: 3px 8px;
+  border-radius: 8px;
+  font-size: 0.65rem;
+  font-weight: 900;
+}
+.prayer-icon {
+  width: 52px; height: 52px;
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+.prayer-icon.fajr { background: linear-gradient(135deg, #1e3a8a, #312e81); }
+.prayer-icon.sunrise { background: linear-gradient(135deg, #fcd34d, #f97316); }
+.prayer-icon.dhuhr { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+.prayer-icon.asr { background: linear-gradient(135deg, #f97316, #ea580c); }
+.prayer-icon.maghrib { background: linear-gradient(135deg, #dc2626, #9d174d); }
+.prayer-icon.isha { background: linear-gradient(135deg, #312e81, #1e1b4b); }
+.prayer-info { flex: 1; }
+.prayer-name {
+  font-family: var(--font-title);
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.prayer-time {
+  font-family: var(--font-accent);
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: var(--gold-dark);
+  direction: ltr;
+  text-align: right;
+  line-height: 1;
+}
+.prayer-remaining {
+  font-size: 0.72rem;
+  color: var(--ink-muted);
+  margin-top: 4px;
+  font-weight: 700;
+}
+
+/* الأرشيف */
+.archive-controls {
+  display: flex; gap: 10px; flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 15px;
+}
+.archive-month-title {
+  font-family: var(--font-title);
+  font-size: clamp(1.3rem, 3vw, 1.8rem);
+  font-weight: 900;
+  color: white;
+  padding: 10px 24px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(184,148,95,0.35);
+  min-width: 260px;
+  text-align: center;
+}
+.archive-search-bar {
+  background: var(--paper);
+  border-radius: 14px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  border: 1.5px solid var(--paper-line);
+  box-shadow: var(--shadow-soft);
+}
+.archive-search-inner {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.archive-search-inner label {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--ink-light);
+  margin-left: 4px;
+}
+.archive-search-inner input,
+.archive-search-inner select {
+  padding: 10px 12px;
+  border: 1.5px solid var(--paper-line);
+  background: var(--paper-dark);
+  border-radius: 10px;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 0.88rem;
+  transition: all 0.2s;
+}
+.archive-search-inner input:focus,
+.archive-search-inner select:focus {
+  outline: none;
+  border-color: var(--gold);
+  background: var(--paper);
+  box-shadow: 0 0 0 3px rgba(184,148,95,0.15);
+}
+.archive-search-inner input[type="number"] { width: 100px; }
+.archive-search-inner input[type="text"] { flex: 1; min-width: 180px; }
+.archive-search-inner button {
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  color: white;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.25s;
+  box-shadow: 0 4px 12px rgba(184,148,95,0.3);
+}
+.archive-search-inner button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(184,148,95,0.45);
+}
+.archive-quick-dates {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+.quick-date-btn {
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1.5px solid var(--paper-line);
+  background: var(--paper-dark);
+  color: var(--ink-light);
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.quick-date-btn:hover {
+  border-color: var(--gold);
+  color: var(--gold-dark);
+  background: var(--paper);
+}
+.archive-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+@media (min-width: 1000px) { .archive-layout { grid-template-columns: 1.2fr 1fr; } }
+.archive-calendar-panel {
+  background: var(--paper);
+  border-radius: 20px;
+  padding: 22px;
+  box-shadow: var(--shadow-paper);
+  border: 1px solid var(--paper-line);
+}
+.cal-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 8px;
+}
+.cal-weekday {
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 900;
+  color: var(--ink-muted);
+  padding: 10px 0;
+  background: var(--paper-dark);
+  border-radius: 8px;
+}
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+.cal-day {
+  aspect-ratio: 1;
+  border-radius: 12px;
+  border: 1.5px solid transparent;
+  background: var(--paper-dark);
+  color: var(--ink);
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+}
+.cal-day:hover {
+  border-color: var(--gold);
+  background: var(--paper);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(184,148,95,0.2);
+}
+.cal-day.empty {
+  background: transparent;
+  cursor: default;
+  pointer-events: none;
+  color: var(--ink-muted);
+  opacity: 0.3;
+}
+.cal-day.today {
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  color: white;
+  box-shadow: 0 4px 12px rgba(184,148,95,0.4);
+}
+.cal-day.selected {
+  border-color: var(--red);
+  background: rgba(192,57,43,0.1);
+  color: var(--red);
+  border-width: 2px;
+}
+.cal-day.today.selected {
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  color: white;
+  border-color: white;
+}
+.cal-day .day-num { font-size: 1rem; line-height: 1; }
+.cal-day .day-hijri {
+  font-size: 0.6rem;
+  color: var(--ink-muted);
+  margin-top: 2px;
+  font-weight: 700;
+}
+.cal-day.today .day-hijri { color: rgba(255,255,255,0.85); }
+.cal-day.selected .day-hijri { color: var(--red); }
+.cal-day.today.selected .day-hijri { color: white; }
+.cal-day .day-dot {
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--blue);
+  box-shadow: 0 0 6px rgba(44,90,160,0.6);
+}
+.cal-day.today .day-dot { background: white; }
+.cal-day.selected .day-dot { background: var(--red); }
+.archive-detail-panel {
+  background: var(--paper);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: var(--shadow-paper);
+  border: 1px solid var(--paper-line);
+  position: sticky;
+  top: 90px;
+  height: fit-content;
+  max-height: calc(100vh - 110px);
+  overflow-y: auto;
+}
+.archive-day-title {
+  font-family: var(--font-title);
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: var(--ink);
+  margin-bottom: 6px;
+  text-align: center;
+}
+.archive-day-sub {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+  margin-bottom: 18px;
+  font-family: var(--font-accent);
+}
+.archive-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.archive-info-box {
+  background: var(--paper-dark);
+  border-radius: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--paper-line);
+}
+.archive-info-box .aib-label {
+  font-size: 0.72rem;
+  color: var(--ink-muted);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.archive-info-box .aib-value {
+  font-family: var(--font-accent);
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: var(--ink);
+  direction: ltr;
+  text-align: right;
+}
+.archive-info-box.full { grid-column: 1 / -1; }
+.archive-note-section {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 2px dashed var(--paper-line);
+}
+.archive-note-label {
+  font-size: 0.82rem;
+  color: var(--ink-light);
+  font-weight: 700;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.archive-note-saved {
+  font-size: 0.72rem;
+  color: var(--green);
+  font-weight: 700;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.archive-note-saved.show { opacity: 1; }
+.archive-note-input {
+  width: 100%;
+  min-height: 120px;
+  padding: 12px 14px;
+  border: 1.5px solid var(--paper-line);
+  background: var(--paper-dark);
+  border-radius: 12px;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  resize: vertical;
+  line-height: 1.6;
+}
+.archive-note-input:focus {
+  outline: none;
+  border-color: var(--gold);
+  background: var(--paper);
+  box-shadow: 0 0 0 3px rgba(184,148,95,0.15);
+}
+.archive-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+.archive-actions .btn { flex: 1; min-width: 100px; }
+.archive-no-selection {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--ink-muted);
+  font-size: 0.95rem;
+}
+.archive-no-selection .ans-icon {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: 15px;
+  animation: pulse 3s ease-in-out infinite;
+}
+
+/* التنزيل */
+.download-bar {
+  max-width: 1500px; margin: 20px auto 0;
+  padding: 0 20px;
+  position: relative; z-index: 1;
+}
+.download-card {
+  background: var(--paper);
+  border-radius: 16px;
+  padding: 18px 22px;
+  box-shadow: var(--shadow-paper);
+  border: 1px solid var(--paper-line);
+  display: flex; gap: 12px; flex-wrap: wrap;
+  align-items: center; justify-content: space-between;
+}
+.download-info { display: flex; align-items: center; gap: 12px; }
+.download-info-icon {
+  width: 42px; height: 42px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-size: 1.3rem;
+}
+.download-info-title { font-weight: 900; font-size: 0.95rem; color: var(--ink); }
+.download-info-sub { font-size: 0.78rem; color: var(--ink-muted); }
+.download-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+.dl-btn {
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1.5px solid var(--paper-line);
+  background: var(--paper-dark);
+  color: var(--ink);
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.25s;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.dl-btn:hover { border-color: var(--gold); transform: translateY(-2px); box-shadow: 0 6px 15px rgba(184,148,95,0.25); }
+.dl-btn.html { border-color: #f97316; color: #ea580c; }
+.dl-btn.pdf { border-color: #dc2626; color: #b91c1c; }
+.dl-btn.txt { border-color: #3b82f6; color: #1d4ed8; }
+.dl-btn.png { border-color: #8b5cf6; color: #6d28d9; }
+
+.footer {
+  max-width: 1500px; margin: 30px auto 0;
+  padding: 25px 20px;
+  text-align: center;
+  color: var(--ink-muted);
+  font-size: 0.85rem;
+  border-top: 2px solid var(--gold);
+  position: relative; z-index: 1;
+}
+.footer-brand {
+  font-family: var(--font-title);
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: var(--gold-dark);
+  margin-bottom: 6px;
+}
+.footer-links {
+  display: flex; gap: 15px; justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  font-size: 0.8rem;
+}
+.toast {
+  position: fixed;
+  bottom: 30px; left: 50%;
+  transform: translateX(-50%) translateY(120px);
+  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  color: white;
+  padding: 14px 26px;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 5000;
+  max-width: 90vw;
+  text-align: center;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+@media (max-width: 600px) {
+  .topbar { padding: 10px 12px; }
+  .brand-name { font-size: 1rem; }
+  .brand-icon { width: 36px; height: 36px; font-size: 1.2rem; }
+  .clock-card { padding: 14px; }
+  .clock-icon { width: 42px; height: 42px; font-size: 1.3rem; }
+  .clock-time { font-size: 1.5rem; }
+  .tab-btn { min-width: 110px; padding: 10px 12px; font-size: 0.8rem; }
+  .page { padding: 20px 15px; min-height: 550px; }
+  .page::after { right: 40px; }
+  .hour-label { width: 55px; font-size: 0.75rem; }
+  .hour-note { font-size: 0.82rem; }
+  .sky-diagram { padding: 20px; min-height: 300px; }
+  .prayer-cards { grid-template-columns: 1fr 1fr; }
+  .prayer-icon { width: 44px; height: 44px; font-size: 1.3rem; }
+  .prayer-time { font-size: 1.1rem; }
+  .archive-calendar-panel { padding: 14px; }
+  .cal-weekday { padding: 6px 0; font-size: 0.68rem; }
+  .cal-day { font-size: 0.82rem; }
+  .cal-day .day-num { font-size: 0.85rem; }
+  .cal-day .day-hijri { font-size: 0.55rem; }
+  .archive-info-grid { grid-template-columns: 1fr 1fr; }
+  .archive-detail-panel { position: static; max-height: none; }
+  .archive-search-inner input[type="number"] { width: 70px; }
+  .archive-search-inner input[type="text"] { min-width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="brand-icon">📅</div>
+      <div class="brand-text">
+        <div class="brand-name">تقويم AhmdSchool</div>
+        <div class="brand-sub">Professional Calendar</div>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <button class="icon-btn" onclick="toggleTheme()" id="themeBtn" title="تبديل المظهر">🌙</button>
+      <button class="icon-btn" onclick="goToToday()" title="اذهب لليوم">🏠</button>
+    </div>
+  </div>
+</div>
+
+<div class="clock-bar">
+  <div class="clock-card">
+    <div class="clock-icon">⏰</div>
+    <div class="clock-content">
+      <div class="clock-time" id="liveClock">--:--:-- <span class="period" id="livePeriod">--</span></div>
+      <div class="clock-date" id="liveDate">—</div>
+      <div class="clock-hijri" id="liveHijri">—</div>
+    </div>
+  </div>
+</div>
+
+<div class="search-bar">
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" class="search-input" id="searchInput" placeholder="ابحث في الملاحظات وتواريخ الميلاد...">
+  </div>
+  <div class="search-results" id="searchResults"></div>
+</div>
+
+<div class="tabs-bar">
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="calendar" onclick="switchTab('calendar')">📖 التقويم</button>
+    <button class="tab-btn" data-tab="birthdays" onclick="switchTab('birthdays')">🎂 تواريخ الميلاد</button>
+    <button class="tab-btn" data-tab="agri" onclick="switchTab('agri')">🌾 الزراعي</button>
+    <button class="tab-btn" data-tab="astro" onclick="switchTab('astro')">🔭 الفلك</button>
+    <button class="tab-btn" data-tab="prayer" onclick="switchTab('prayer')">🕌 الصلاة</button>
+    <button class="tab-btn" data-tab="daynight" onclick="switchTab('daynight')">🌗 الليل والنهار</button>
+    <button class="tab-btn" data-tab="archive" onclick="switchTab('archive')">📜 الأرشيف</button>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="tab-pane active" id="tab-calendar">
+    <div class="calendar-controls">
+      <button class="nav-btn" onclick="changeDay(-1)">◀ اليوم السابق</button>
+      <div class="date-display" id="calDateDisplay">—</div>
+      <button class="nav-btn" onclick="changeDay(1)">اليوم التالي ▶</button>
+      <button class="nav-btn" onclick="goToToday()">🏠 اليوم</button>
+    </div>
+    <div class="calendar-book">
+      <div class="page day-page">
+        <div class="page-header">
+          <div class="page-day-name" id="dayName">—</div>
+          <div class="page-date" id="dateGregorian">—</div>
+          <span class="page-period day">☀️ النهار</span>
+        </div>
+        <div class="hours-list" id="dayHours"></div>
+        <div class="page-footer">
+          <div class="quick-note-label">📝 ملاحظات الصفحة</div>
+          <textarea class="quick-note" id="dayNote" placeholder="اكتب ملاحظاتك هنا..."></textarea>
+        </div>
+      </div>
+      <div class="page night-page">
+        <div class="page-header">
+          <div class="page-day-name" id="nightDayName">—</div>
+          <div class="page-date" id="nightDateGregorian">—</div>
+          <span class="page-period night">🌙 الليل</span>
+        </div>
+        <div class="hours-list" id="nightHours"></div>
+        <div class="page-footer">
+          <div class="quick-note-label">📝 ملاحظات الصفحة</div>
+          <textarea class="quick-note" id="nightNote" placeholder="اكتب ملاحظاتك هنا..."></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-pane" id="tab-birthdays">
+    <div class="birthday-layout">
+      <div class="card-panel">
+        <div class="panel-title">🎂 إضافة تاريخ ميلاد</div>
+        <div class="form-group">
+          <label class="form-label">👤 الاسم</label>
+          <input type="text" class="form-input" id="bdName" placeholder="مثال: أحمد محمد">
+        </div>
+        <div class="form-group">
+          <label class="form-label">📅 تاريخ الميلاد</label>
+          <input type="date" class="form-input" id="bdDate">
+        </div>
+        <div class="form-group">
+          <label class="form-label">📝 ملاحظات (اختياري)</label>
+          <input type="text" class="form-input" id="bdNote" placeholder="مثال: أخي الأكبر">
+        </div>
+        <button class="btn btn-primary" onclick="addBirthday()">➕ إضافة</button>
+      </div>
+      <div class="card-panel">
+        <div class="panel-title">📋 قائمة تواريخ الميلاد (<span id="bdCount">0</span>)</div>
+        <div class="birthday-list" id="birthdayList"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-pane" id="tab-agri">
+    <div class="card-panel" style="margin-bottom: 20px;">
+      <div class="panel-title">🌾 التقويم الزراعي المصري (القبطي)</div>
+      <p style="color: var(--ink-light); font-size: 0.9rem; line-height: 1.8;">
+        التقويم الزراعي المصري القديم، يتبعه الفلاح المصري منذ آلاف السنين لتنظيم مواسم الزراعة والحصاد. يعتمد على شهور قبطية مرتبطة بحركة الشمس على مدار السنة، ومعها المحاصيل المصرية الأصيلة لكل شهر.
+      </p>
+    </div>
+    <div class="agri-grid" id="agriGrid"></div>
+  </div>
+
+  <div class="tab-pane" id="tab-astro">
+    <div class="card-panel" style="margin-bottom: 20px;">
+      <div class="panel-title">🔭 الأحداث الفلكية اليوم</div>
+      <p style="color: var(--ink-light); font-size: 0.88rem; margin-bottom: 5px;">
+        الأوقات محسوبة فلكياً حسب موقعك الحالي.
+      </p>
+    </div>
+    <div class="astro-grid" id="astroGrid"></div>
+    <div class="events-list" id="astroEvents"></div>
+  </div>
+
+  <div class="tab-pane" id="tab-prayer">
+    <div class="auto-location-banner">
+      <div class="auto-location-content">
+        <div class="auto-location-city" id="prayerCityName">🕌 جاري تحديد موقعك...</div>
+        <div class="auto-location-date" id="prayerDateDisplay">—</div>
+        <div class="auto-location-status" id="prayerLocationStatus">📍 في انتظار إذن الموقع</div>
+      </div>
+    </div>
+
+    <div class="prayer-cards" id="prayerCards"></div>
+
+    <div class="card-panel" style="margin-top: 20px;">
+      <div class="panel-title">⚙️ إعدادات إضافية</div>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+        <button class="btn btn-secondary" onclick="requestLocation()">📍 تحديث موقعي</button>
+        <button class="btn btn-secondary" onclick="loadPrayerTimes()">🔄 إعادة الحساب</button>
+      </div>
+      <p style="font-size: 0.82rem; color: var(--ink-muted); margin-top: 12px; line-height: 1.7;">
+        <strong>ℹ️ ملاحظة:</strong> المواقيت محسوبة فلكياً بدقة (الهيئة المصرية العامة للمساحة — الفجر 19.5°، العشاء 17.5°) وتعمل أوفلاين 100%. لو رفضت إذن الموقع، سيتم استخدام المنطقة الزمنية للجهاز.
+      </p>
+    </div>
+  </div>
+
+  <div class="tab-pane" id="tab-daynight">
+    <div class="daynight-layout">
+      <div class="sky-diagram" id="skyDiagram">
+        <div class="stars"></div>
+        <div class="sky-arc"></div>
+        <div class="sky-label east">🌅 الشرق</div>
+        <div class="sky-label south">☀️ الجنوب</div>
+        <div class="sky-label west">🌇 الغرب</div>
+        <div class="sun-orb" id="sunOrb"></div>
+        <div class="moon-orb" id="moonOrb"></div>
+        <div class="sky-horizon"></div>
+      </div>
+      <div class="daynight-info" id="daynightInfo"></div>
+    </div>
+    <div class="day-progress-bar" style="margin-top: 20px;">
+      <div class="day-progress-label">
+        <span>🌞 تقدم اليوم</span>
+        <span id="dayPercent">0%</span>
+      </div>
+      <div class="day-progress-track">
+        <div class="day-progress-handle" id="dayHandle" style="left: 0%"></div>
+      </div>
+      <div class="day-progress-marks">
+        <span>12 AM</span><span>6 AM</span><span>12 PM</span><span>6 PM</span><span>12 AM</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- الأرشيف -->
+  <div class="tab-pane" id="tab-archive">
+    <!-- شريط البحث السريع -->
+    <div class="archive-search-bar">
+      <div class="archive-search-inner">
+        <label>🔍 ابحث:</label>
+        <input type="text" id="archiveQuickSearch" placeholder="اكتب تاريخ (2020-05-15) أو كلمة مفتاحية..." onkeydown="if(event.key==='Enter') archiveDoSearch()">
+        <label>📅 يوم:</label>
+        <input type="number" id="archiveDaySearch" min="1" max="31" placeholder="15">
+        <label>📆 شهر:</label>
+        <select id="archiveMonthSearch">
+          <option value="">—</option>
+          <option value="0">يناير</option>
+          <option value="1">فبراير</option>
+          <option value="2">مارس</option>
+          <option value="3">أبريل</option>
+          <option value="4">مايو</option>
+          <option value="5">يونيو</option>
+          <option value="6">يوليو</option>
+          <option value="7">أغسطس</option>
+          <option value="8">سبتمبر</option>
+          <option value="9">أكتوبر</option>
+          <option value="10">نوفمبر</option>
+          <option value="11">ديسمبر</option>
+        </select>
+        <label>🗓️ سنة:</label>
+        <input type="number" id="archiveYearSearch" min="1900" max="2100" placeholder="2025">
+        <button onclick="archiveDoSearch()">🔍 ابحث</button>
+      </div>
+      <div class="archive-quick-dates">
+        <button class="quick-date-btn" onclick="archiveQuickJump(0)">📌 اليوم</button>
+        <button class="quick-date-btn" onclick="archiveQuickJump(-1)">⬅️ أمس</button>
+        <button class="quick-date-btn" onclick="archiveQuickJump(1)">➡️ غداً</button>
+        <button class="quick-date-btn" onclick="archiveQuickJump(-7)">⬅️ الأسبوع الماضي</button>
+        <button class="quick-date-btn" onclick="archiveQuickJump(7)">➡️ الأسبوع القادم</button>
+        <button class="quick-date-btn" onclick="archiveQuickJump(-30)">⬅️ الشهر الماضي</button>
+        <button class="quick-date-btn" onclick="archiveQuickJump(30)">➡️ الشهر القادم</button>
+        <button class="quick-date-btn" onclick="archiveQuickJump(-365)">⬅️ العام الماضي</button>
+        <button class="quick-date-btn" onclick="archiveQuickJump(365)">➡️ العام القادم</button>
+      </div>
+    </div>
+
+    <div class="archive-controls">
+      <button class="nav-btn" onclick="archiveChangeMonth(-1)">◀ الشهر السابق</button>
+      <div class="archive-month-title" id="archiveMonthTitle">—</div>
+      <button class="nav-btn" onclick="archiveChangeMonth(1)">الشهر التالي ▶</button>
+      <button class="nav-btn" onclick="archiveChangeYear(-1)">◀◀ سنة</button>
+      <button class="nav-btn" onclick="archiveChangeYear(1)">سنة ▶▶</button>
+      <button class="nav-btn" onclick="archiveGoToday()">🏠 اليوم</button>
+    </div>
+    <div class="archive-layout">
+      <div class="archive-calendar-panel">
+        <div class="cal-weekdays" id="archiveWeekdays"></div>
+        <div class="cal-grid" id="archiveCalGrid"></div>
+      </div>
+      <div class="archive-detail-panel" id="archiveDetailPanel">
+        <div class="archive-no-selection">
+          <span class="ans-icon">📅</span>
+          اضغط على أي يوم لعرض تفاصيله وإضافة ملاحظة
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="download-bar">
+  <div class="download-card">
+    <div class="download-info">
+      <div class="download-info-icon">💾</div>
+      <div class="download-info-text">
+        <div class="download-info-title">تنزيل المحتوى الحالي</div>
+        <div class="download-info-sub" id="downloadSub">التقويم — <span id="downloadDate">—</span></div>
+      </div>
+    </div>
+    <div class="download-buttons">
+      <button class="dl-btn html" onclick="downloadAs('html')">🌐 HTML</button>
+      <button class="dl-btn pdf" onclick="downloadAs('pdf')">📄 PDF</button>
+      <button class="dl-btn txt" onclick="downloadAs('txt')">📝 TXT</button>
+      <button class="dl-btn png" onclick="downloadAs('png')">🖼️ PNG</button>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-brand">📅 تقويم AhmdSchool</div>
+  <div>أجندة احترافية تعمل أوفلاين — بياناتك محفوظة في متصفحك فقط</div>
+  <div class="footer-links">
+    <span>© 2025 — جميع الحقوق محفوظة <strong style="color: var(--gold-dark);">AhmdSchool</strong></span>
+    <span>✉️ openlibrary@collector.org</span>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================
+// الحالة العامة
+// ============================================
+let currentDate = new Date();
+let notes = {};
+let birthdays = [];
+let isDarkMode = false;
+let currentTab = 'calendar';
+let userCoords = null;
+let userCityName = 'موقعك الحالي';
+let archiveViewYear = new Date().getFullYear();
+let archiveViewMonth = new Date().getMonth();
+let archiveSelectedDate = null;
+
+const AGRI_MONTHS = [
+  { name: 'توت', emoji: '🌾', start: [9, 11], end: [10, 10], season: 'الفيض', color: '#1e40af', desc: 'أول شهور السنة القبطية. موسم اكتمال فيضان النيل.', crops: ['الرمان', 'البسر', 'الرطب', 'الزيتون', 'القطن', 'السفرجل'] },
+  { name: 'بابة', emoji: '🌱', start: [10, 11], end: [11, 10], season: 'الفيض', color: '#0891b2', desc: 'موسم الزراعة الشتوية. غرس القمح والشعير والبرسيم.', crops: ['الفول', 'البرسيم', 'الكتان', 'القرط', 'السمسم', 'القلقاس', 'التمر'] },
+  { name: 'هاتور', emoji: '🌿', start: [11, 11], end: [12, 10], season: 'الفيض', color: '#059669', desc: 'شهر نمو المحاصيل. الأرض في أبهى صورها.', crops: ['الخشخاش', 'البنفسج', 'قصب السكر', 'القمح', 'الشعير'] },
+  { name: 'كياهك', emoji: '❄️', start: [12, 11], end: [1, 10], season: 'الشتاء', color: '#0ea5e9', desc: 'بداية الشتاء. ليالي طويلة.', crops: ['الخيار', 'الهليون', 'الجلبة', 'الترمس', 'الكرنب', 'الجزر', 'الكراث'] },
+  { name: 'طوبة', emoji: '🌧️', start: [1, 11], end: [2, 10], season: 'الشتاء', color: '#6366f1', desc: 'أبرد شهور السنة. "طوبة تخلي الصبية كركوبة".', crops: ['الحمص', 'الجلبان', 'المدس', 'القطر'] },
+  { name: 'أمشير', emoji: '🌬️', start: [2, 11], end: [3, 10], season: 'الشتاء', color: '#8b5cf6', desc: 'شهر الرياح. "أمشير أبو الزعابير الكتير".', crops: ['القطن البكر', 'الذرة', 'قصب السكر', 'الكمون', 'التين', 'التفاح', 'الخيار'] },
+  { name: 'برمهات', emoji: '🌸', start: [3, 11], end: [4, 9], season: 'الربيع', color: '#ec4899', desc: 'بداية الربيع. اعتدال في الجو.', crops: ['البسلة البلدي', 'القطن الهندي', 'الكتان', 'الملوخية', 'الكمون'] },
+  { name: 'برمودة', emoji: '🌾', start: [4, 10], end: [5, 9], season: 'الربيع', color: '#f59e0b', desc: 'موسم الحصاد. أهم شهور الفلاح.', crops: ['الفول', 'العدس', 'الترمس', 'القمح', 'الفول السوداني', 'الورد', 'البطيخ', 'التوت'] },
+  { name: 'بشنس', emoji: '☀️', start: [5, 10], end: [6, 8], season: 'الربيع', color: '#f97316', desc: 'بداية الصيف. موسم جني الفواكه الصيفية.', crops: ['المشمش', 'البرقوق', 'التفاح', 'البصل', 'السمسم', 'القلقاس'] },
+  { name: 'بؤونة', emoji: '🔥', start: [6, 9], end: [7, 8], season: 'الصيف', color: '#dc2626', desc: 'أشد شهور السنة حرارة. "بؤونة تكلي الرؤوس".', crops: ['الأرز', 'الذرة الشامي', 'الفاصوليا', 'القرع', 'الكوسة', 'العنب', 'الخوخ', 'المشمش'] },
+  { name: 'أبيب', emoji: '💧', start: [7, 9], end: [8, 8], season: 'الصيف', color: '#0ea5e9', desc: 'بداية فيضان النيل. أهم موسم للفلاح.', crops: ['الجرجير', 'الكرفس', 'السلق', 'البقدونس', 'الباذنجان', 'الباميا', 'الملوخية', 'الرمان'] },
+  { name: 'مسري', emoji: '🌊', start: [8, 9], end: [9, 10], season: 'الفيض', color: '#1e40af', desc: 'يستمر الفيضان. آخر شهور السنة القبطية.', crops: ['البلح', 'العنب', 'التين', 'الزيتون الأخضر', 'البصل', 'الطماطم', 'اللفت'] }
+];
+
+// ============================================
+// أدوات
+// ============================================
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), 2500);
+}
+function dateKey(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+function formatTime(d) {
+  let h = d.getHours();
+  const m = String(d.getMinutes()).padStart(2, '0');
+  const s = String(d.getSeconds()).padStart(2, '0');
+  const period = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
+  return { time: `${h}:${m}:${s}`, period };
+}
+function formatHour12(h) {
+  const period = h >= 12 ? 'PM' : 'AM';
+  const h12 = h % 12 || 12;
+  return `${h12} ${period}`;
+}
+function getHijriDate(date) {
+  try {
+    return new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', {
+      year: 'numeric', month: 'long', day: 'numeric'
+    }).format(date);
+  } catch (e) { return ''; }
+}
+function getHijriDayOnly(date) {
+  try {
+    return new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', { day: 'numeric' }).format(date);
+  } catch (e) { return ''; }
+}
+
+// ============================================
+// الساعة الحية
+// ============================================
+function updateClock() {
+  const now = new Date();
+  const t = formatTime(now);
+  document.getElementById('liveClock').innerHTML = `${t.time} <span class="period">${t.period}</span>`;
+  document.getElementById('liveDate').textContent =
+    now.toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  document.getElementById('liveHijri').textContent = '🌙 ' + getHijriDate(now);
+  updateDayProgress(now);
+  if (currentTab === 'daynight') updateSkyDiagram(now);
+  if (currentTab === 'prayer') updatePrayerCountdown();
+}
+function updateDayProgress(now) {
+  const totalMin = now.getHours() * 60 + now.getMinutes();
+  const percent = (totalMin / (24 * 60)) * 100;
+  const handle = document.getElementById('dayHandle');
+  if (handle) handle.style.left = percent + '%';
+  const p = document.getElementById('dayPercent');
+  if (p) p.textContent = Math.round(percent) + '%';
+}
+
+// ============================================
+// تقويم اليوم
+// ============================================
+function renderCalendar() {
+  const d = currentDate;
+  const dayKey = dateKey(d);
+  const dayName = d.toLocaleDateString('ar-EG', { weekday: 'long' });
+  const dateFull = d.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
+
+  document.getElementById('dayName').textContent = `☀️ ${dayName}`;
+  document.getElementById('dateGregorian').textContent = dateFull;
+  document.getElementById('nightDayName').textContent = `🌙 ${dayName}`;
+  document.getElementById('nightDateGregorian').textContent = dateFull;
+  document.getElementById('calDateDisplay').textContent = dateFull;
+
+  const dayData = notes[dayKey] || { dayNote: '', nightNote: '', hours: {} };
+  const dh = document.getElementById('dayHours');
+  dh.innerHTML = '';
+  for (let h = 6; h < 18; h++) dh.appendChild(createHourRow(h, dayData, dayKey));
+
+  const nh = document.getElementById('nightHours');
+  nh.innerHTML = '';
+  for (let h = 18; h < 24; h++) nh.appendChild(createHourRow(h, dayData, dayKey));
+  for (let h = 0; h < 6; h++) nh.appendChild(createHourRow(h, dayData, dayKey));
+
+  document.getElementById('dayNote').value = dayData.dayNote || '';
+  document.getElementById('nightNote').value = dayData.nightNote || '';
+  document.getElementById('downloadDate').textContent = dateFull;
+
+  document.getElementById('dayNote').oninput = e => {
+    if (!notes[dayKey]) notes[dayKey] = { dayNote: '', nightNote: '', hours: {} };
+    notes[dayKey].dayNote = e.target.value;
+    saveNotes();
+  };
+  document.getElementById('nightNote').oninput = e => {
+    if (!notes[dayKey]) notes[dayKey] = { dayNote: '', nightNote: '', hours: {} };
+    notes[dayKey].nightNote = e.target.value;
+    saveNotes();
+  };
+}
+function createHourRow(hour, dayData, dayKey) {
+  const row = document.createElement('div');
+  row.className = 'hour-row';
+  const now = new Date();
+  const isToday = dateKey(now) === dayKey;
+  const isCurrentHour = isToday && now.getHours() === hour;
+
+  const label = document.createElement('div');
+  label.className = 'hour-label' + (isCurrentHour ? ' current' : '');
+  label.textContent = formatHour12(hour);
+  row.appendChild(label);
+
+  const ta = document.createElement('textarea');
+  ta.className = 'hour-note';
+  ta.placeholder = `ملاحظة الساعة ${formatHour12(hour)}...`;
+  ta.value = (dayData.hours && dayData.hours[hour]) || '';
+  if (ta.value) ta.classList.add('has-content');
+  ta.addEventListener('input', () => {
+    if (!notes[dayKey]) notes[dayKey] = { dayNote: '', nightNote: '', hours: {} };
+    if (!notes[dayKey].hours) notes[dayKey].hours = {};
+    notes[dayKey].hours[hour] = ta.value;
+    ta.classList.toggle('has-content', !!ta.value);
+    saveNotes();
+  });
+  row.appendChild(ta);
+  return row;
+}
+function changeDay(delta) { currentDate.setDate(currentDate.getDate() + delta); saveCurrentDate(); renderCalendar(); }
+function goToToday() { currentDate = new Date(); saveCurrentDate(); renderCalendar(); showToast('📅 عدنا لليوم'); }
+function saveCurrentDate() { localStorage.setItem('cal_current_date', currentDate.toISOString()); }
+function saveNotes() { try { localStorage.setItem('cal_notes', JSON.stringify(notes)); } catch (e) {} }
+function loadNotes() { try { const s = localStorage.getItem('cal_notes'); if (s) notes = JSON.parse(s); } catch (e) { notes = {}; } }
+
+// ============================================
+// تواريخ الميلاد
+// ============================================
+function loadBirthdays() { try { const s = localStorage.getItem('cal_birthdays'); if (s) birthdays = JSON.parse(s); } catch (e) { birthdays = []; } }
+function saveBirthdays() { try { localStorage.setItem('cal_birthdays', JSON.stringify(birthdays)); } catch (e) {} }
+function addBirthday() {
+  const name = document.getElementById('bdName').value.trim();
+  const date = document.getElementById('bdDate').value;
+  const note = document.getElementById('bdNote').value.trim();
+  if (!name) { showToast('⚠️ اكتب الاسم'); return; }
+  if (!date) { showToast('⚠️ اختر تاريخ الميلاد'); return; }
+  birthdays.push({ id: 'bd_' + Date.now(), name, date, note });
+  saveBirthdays(); renderBirthdays();
+  document.getElementById('bdName').value = ''; document.getElementById('bdDate').value = ''; document.getElementById('bdNote').value = '';
+  showToast('🎂 تم إضافة تاريخ الميلاد');
+}
+function deleteBirthday(id) {
+  if (!confirm('حذف تاريخ الميلاد؟')) return;
+  birthdays = birthdays.filter(b => b.id !== id);
+  saveBirthdays(); renderBirthdays();
+  showToast('🗑️ تم الحذف');
+}
+function renderBirthdays() {
+  const list = document.getElementById('birthdayList');
+  document.getElementById('bdCount').textContent = birthdays.length;
+  if (birthdays.length === 0) {
+    list.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--ink-muted);">لا توجد تواريخ ميلاد بعد.</div>';
+    return;
+  }
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const sorted = [...birthdays].sort((a, b) => getNextBirthday(new Date(a.date), today) - getNextBirthday(new Date(b.date), today));
+  list.innerHTML = '';
+  sorted.forEach(b => {
+    const bd = new Date(b.date);
+    const next = getNextBirthday(bd, today);
+    const daysLeft = Math.ceil((next - today) / (1000 * 60 * 60 * 24));
+    const isToday = daysLeft === 0;
+    const card = document.createElement('div');
+    card.className = 'birthday-card';
+    card.innerHTML = `
+      <button class="birthday-delete" onclick="deleteBirthday('${b.id}')">✕</button>
+      <div class="birthday-header">
+        <div class="birthday-avatar">${escapeHtml(b.name.charAt(0))}</div>
+        <div>
+          <div class="birthday-name">${escapeHtml(b.name)}</div>
+          <div class="birthday-date">${bd.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
+        </div>
+      </div>
+      <div class="birthday-details">
+        <span class="birthday-badge ${isToday ? 'today' : ''}">${isToday ? 'عيد ميلاده اليوم!' : `بعد ${daysLeft} يوم`}</span>
+        ${b.note ? `<span class="birthday-badge">📝 ${escapeHtml(b.note)}</span>` : ''}
+      </div>
+    `;
+    list.appendChild(card);
+  });
+}
+function getNextBirthday(birthDate, today) {
+  const next = new Date(today.getFullYear(), birthDate.getMonth(), birthDate.getDate());
+  if (next < today) next.setFullYear(today.getFullYear() + 1);
+  return next;
+}
+
+// ============================================
+// الزراعي
+// ============================================
+function renderAgri() {
+  const today = new Date();
+  const m = today.getMonth() + 1;
+  const d = today.getDate();
+  const grid = document.getElementById('agriGrid');
+  grid.innerHTML = '';
+  AGRI_MONTHS.forEach(mn => {
+    const inMonth = isInAgriMonth(m, d, mn.start, mn.end);
+    const card = document.createElement('div');
+    card.className = 'agri-card' + (inMonth ? ' current' : '');
+    card.innerHTML = `
+      <span class="agri-emoji">${mn.emoji}</span>
+      <div class="agri-name">${mn.name}</div>
+      <div class="agri-period">${mn.start[1]}/${mn.start[0]} → ${mn.end[1]}/${mn.end[0]}</div>
+      <div class="agri-desc">${mn.desc}</div>
+      <div class="agri-crops">${mn.crops.map(c => `<span class="agri-crop">🌾 ${c}</span>`).join('')}</div>
+      <span class="agri-season" style="background: ${mn.color}20; color: ${mn.color}; border: 1px solid ${mn.color}40;">🌿 موسم ${mn.season}</span>
+    `;
+    grid.appendChild(card);
+  });
+}
+function isInAgriMonth(m, d, start, end) {
+  const sv = start[0] * 100 + start[1];
+  const ev = end[0] * 100 + end[1];
+  const cv = m * 100 + d;
+  if (sv <= ev) return cv >= sv && cv <= ev;
+  return cv >= sv || cv <= ev;
+}
+
+// ============================================
+// الفلك
+// ============================================
+function calculateAstroEvents(lat = 30.04) {
+  const now = new Date();
+  const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
+  const dec = 23.44 * Math.sin((360 / 365) * (dayOfYear - 81) * Math.PI / 180);
+  const latRad = lat * Math.PI / 180;
+  const decRad = dec * Math.PI / 180;
+  const ha = Math.acos(-Math.tan(latRad) * Math.tan(decRad)) * 180 / Math.PI;
+  const dayLength = (ha * 2) / 15;
+  const sunrise = 12 - dayLength / 2;
+  const sunset = 12 + dayLength / 2;
+  const lunarCycle = 29.53059;
+  const knownNewMoon = new Date('2000-01-06T18:14:00Z');
+  const daysSinceNew = (now - knownNewMoon) / (1000 * 60 * 60 * 24);
+  const moonPhase = ((daysSinceNew % lunarCycle) + lunarCycle) % lunarCycle;
+  const moonIllum = Math.round(50 * (1 - Math.cos(2 * Math.PI * moonPhase / lunarCycle)));
+  return {
+    sunrise: formatDecimalHour(sunrise),
+    sunset: formatDecimalHour(sunset),
+    solarNoon: formatDecimalHour(12),
+    dayLength: formatDuration(dayLength),
+    nightLength: formatDuration(24 - dayLength),
+    moonIllumination: moonIllum,
+    moonPhaseName: getMoonPhaseName(moonPhase),
+    declination: dec.toFixed(2)
+  };
+}
+function formatDecimalHour(h) {
+  const hours = Math.floor(h);
+  const minutes = Math.round((h - hours) * 60);
+  const period = hours >= 12 ? 'PM' : 'AM';
+  const h12 = hours % 12 || 12;
+  return `${h12}:${String(minutes).padStart(2, '0')} ${period}`;
+}
+function formatDuration(hours) {
+  const h = Math.floor(hours);
+  const m = Math.round((hours - h) * 60);
+  return `${h}س ${m}د`;
+}
+function getMoonPhaseName(phase) {
+  if (phase < 1.84) return 'محاق 🌑';
+  if (phase < 5.53) return 'هلال متزايد 🌒';
+  if (phase < 9.22) return 'تربيع أول 🌓';
+  if (phase < 12.91) return 'أحدب متزايد 🌔';
+  if (phase < 16.61) return 'بدر كامل 🌕';
+  if (phase < 20.30) return 'أحدب متناقص 🌖';
+  if (phase < 23.99) return 'تربيع أخير 🌗';
+  if (phase < 27.68) return 'هلال متناقص 🌘';
+  return 'محاق 🌑';
+}
+function renderAstro() {
+  const lat = userCoords ? userCoords.lat : 30.04;
+  const a = calculateAstroEvents(lat);
+  const grid = document.getElementById('astroGrid');
+  grid.innerHTML = `
+    <div class="astro-card"><div class="astro-icon sun">🌅</div><div class="astro-content"><div class="astro-label">شروق الشمس</div><div class="astro-value">${a.sunrise}</div></div></div>
+    <div class="astro-card"><div class="astro-icon sun">🌇</div><div class="astro-content"><div class="astro-label">غروب الشمس</div><div class="astro-value">${a.sunset}</div></div></div>
+    <div class="astro-card"><div class="astro-icon sun">☀️</div><div class="astro-content"><div class="astro-label">الزوال</div><div class="astro-value">${a.solarNoon}</div></div></div>
+    <div class="astro-card"><div class="astro-icon sun">⏱️</div><div class="astro-content"><div class="astro-label">طول النهار</div><div class="astro-value">${a.dayLength}</div></div></div>
+    <div class="astro-card"><div class="astro-icon moon">🌙</div><div class="astro-content"><div class="astro-label">مرحلة القمر</div><div class="astro-value">${a.moonPhaseName}</div></div></div>
+    <div class="astro-card"><div class="astro-icon moon">💡</div><div class="astro-content"><div class="astro-label">إضاءة القمر</div><div class="astro-value">${a.moonIllumination}%</div></div></div>
+    <div class="astro-card"><div class="astro-icon star">📐</div><div class="astro-content"><div class="astro-label">ميل الشمس</div><div class="astro-value">${a.declination}°</div></div></div>
+    <div class="astro-card"><div class="astro-icon planet">📍</div><div class="astro-content"><div class="astro-label">موقع الحساب</div><div class="astro-value">${userCoords ? 'GPS' : 'افتراضي'}</div></div></div>
+  `;
+  const events = [
+    { time: a.sunrise, title: '🌅 شروق الشمس', desc: 'بداية النهار. ذروة النشاط البيولوجي.' },
+    { time: formatDecimalHour(9), title: '☕ منتصف الصباح', desc: 'وقت مناسب للعمل والإنجاز.' },
+    { time: a.solarNoon, title: '☀️ الزوال', desc: 'الشمس في أعلى نقطة. أقصر ظل.' },
+    { time: formatDecimalHour(15), title: '🌤️ بعد الظهر', desc: 'وقت طيب للراحة.' },
+    { time: a.sunset, title: '🌇 غروب الشمس', desc: 'بداية الليل.' },
+    { time: formatDecimalHour(20), title: '🌆 ساعة الغروب المدني', desc: 'اختفاء ضوء الشمس.' },
+    { time: '12:00 AM', title: '🌙 منتصف الليل', desc: 'أطول الظلال.' }
+  ];
+  document.getElementById('astroEvents').innerHTML = events.map(e => `
+    <div class="event-item">
+      <div class="event-time">${e.time}</div>
+      <div class="event-content"><div class="event-title">${e.title}</div><div class="event-desc">${e.desc}</div></div>
+    </div>
+  `).join('');
+}
+
+// ============================================
+// مواقيت الصلاة — حساب فلكي يدوي 100% أوفلاين
+// ============================================
+function requestLocation() {
+  const status = document.getElementById('prayerLocationStatus');
+  if (!navigator.geolocation) {
+    status.textContent = '⚠️ المتصفح لا يدعم تحديد الموقع';
+    status.className = 'auto-location-status denied';
+    fallbackToTimezone();
+    return;
+  }
+  status.textContent = '📍 جاري تحديد موقعك...';
+  status.className = 'auto-location-status';
+
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      userCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      localStorage.setItem('cal_user_coords', JSON.stringify(userCoords));
+      status.textContent = `✅ موقعك محدد (${userCoords.lat.toFixed(2)}, ${userCoords.lng.toFixed(2)})`;
+      status.className = 'auto-location-status granted';
+      reverseGeocode(userCoords);
+      loadPrayerTimes();
+      if (currentTab === 'astro') renderAstro();
+    },
+    (err) => {
+      console.warn('GPS error:', err);
+      status.textContent = '⚠️ رُفض الإذن — يتم استخدام إعدادات المنطقة الزمنية';
+      status.className = 'auto-location-status denied';
+      fallbackToTimezone();
+    },
+    { timeout: 10000, enableHighAccuracy: false }
+  );
+}
+
+function fallbackToTimezone() {
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+  const tzMap = {
+    'Africa/Cairo': { lat: 30.0444, lng: 31.2357, name: 'القاهرة' },
+    'Asia/Riyadh': { lat: 24.7136, lng: 46.6753, name: 'الرياض' },
+    'Asia/Dubai': { lat: 25.2048, lng: 55.2708, name: 'دبي' },
+    'Africa/Khartoum': { lat: 15.5007, lng: 32.5599, name: 'الخرطوم' },
+    'Asia/Amman': { lat: 31.9454, lng: 35.9284, name: 'عمّان' },
+    'Asia/Beirut': { lat: 33.8938, lng: 35.5018, name: 'بيروت' },
+    'Asia/Baghdad': { lat: 33.3152, lng: 44.3661, name: 'بغداد' },
+    'Asia/Damascus': { lat: 33.5138, lng: 36.2765, name: 'دمشق' },
+    'Asia/Kuwait': { lat: 29.3759, lng: 47.9774, name: 'الكويت' },
+    'Asia/Qatar': { lat: 25.2854, lng: 51.5310, name: 'الدوحة' },
+    'Africa/Tripoli': { lat: 32.8872, lng: 13.1913, name: 'طرابلس' },
+    'Africa/Tunis': { lat: 36.8065, lng: 10.1815, name: 'تونس' },
+    'Africa/Algiers': { lat: 36.7538, lng: 3.0588, name: 'الجزائر' },
+    'Africa/Casablanca': { lat: 33.5731, lng: -7.5898, name: 'الدار البيضاء' }
+  };
+  const found = tzMap[tz] || { lat: 30.0444, lng: 31.2357, name: 'القاهرة' };
+  userCoords = { lat: found.lat, lng: found.lng };
+  userCityName = found.name;
+  localStorage.setItem('cal_user_coords', JSON.stringify(userCoords));
+  document.getElementById('prayerCityName').textContent = `🕌 ${userCityName}`;
+  loadPrayerTimes();
+  if (currentTab === 'astro') renderAstro();
+}
+
+function reverseGeocode(coords) {
+  fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords.lat}&lon=${coords.lng}&accept-language=ar`)
+    .then(r => r.json())
+    .then(data => {
+      const city = data.address?.city || data.address?.town || data.address?.village || data.address?.state || 'موقعك';
+      const country = data.address?.country || '';
+      userCityName = city + (country ? '، ' + country : '');
+      document.getElementById('prayerCityName').textContent = `🕌 ${userCityName}`;
+    })
+    .catch(() => {
+      userCityName = 'موقعك الحالي';
+      document.getElementById('prayerCityName').textContent = '🕌 موقعك الحالي';
+    });
+}
+
+// ============================================
+// حساب المواقيت فلكياً — يدوي بدون مكتبات
+// ============================================
+function calculatePrayerTimes(lat, lng, date) {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  const dayOfYear = Math.floor((d - new Date(d.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24)) + 1;
+  const latRad = lat * Math.PI / 180;
+
+  // ميل الشمس
+  const declination = 23.45 * Math.sin((360 / 365) * (dayOfYear - 81) * Math.PI / 180);
+  const decRad = declination * Math.PI / 180;
+
+  // معادلة الزمن
+  const B = (360 / 365) * (dayOfYear - 81) * Math.PI / 180;
+  const EoT = 9.87 * Math.sin(2 * B) - 7.53 * Math.cos(B) - 1.5 * Math.sin(B);
+
+  // فرق التوقيت من UTC
+  const timezoneOffset = -d.getTimezoneOffset() / 60;
+
+  // وقت الظهر الشمسي بالتوقيت المحلي
+  const solarNoonLocal = 12 - lng / 15 - EoT / 60 + timezoneOffset;
+
+  // دالة حساب زاوية الساعة
+  const hourAngle = (angleDeg) => {
+    const a = angleDeg * Math.PI / 180;
+    const cosH = (Math.sin(a) - Math.sin(latRad) * Math.sin(decRad)) / (Math.cos(latRad) * Math.cos(decRad));
+    if (cosH > 1 || cosH < -1) return 6; // حالة قطبية
+    return Math.acos(cosH) * 180 / Math.PI / 15;
+  };
+
+  // الفجر: -19.5° | العشاء: -17.5° (الهيئة المصرية)
+  const fajrHA = hourAngle(-19.5);
+  const ishaHA = hourAngle(-17.5);
+
+  // العصر: ظل المثل
+  const asrAngle = Math.atan(1 / (1 + Math.tan(Math.abs(latRad - decRad)))) * 180 / Math.PI;
+  const asrHA = hourAngle(90 - asrAngle);
+
+  // الشروق والغروب: -0.833°
+  const sunriseHA = hourAngle(-0.833);
+
+  const toDate = (hours) => {
+    const h = Math.floor(hours);
+    const m = Math.floor((hours - h) * 60);
+    const s = Math.floor(((hours - h) * 60 - m) * 60);
+    const dt = new Date(date);
+    dt.setHours(h, m, s, 0);
+    return dt;
+  };
+
+  return {
+    fajr: toDate(solarNoonLocal - fajrHA),
+    sunrise: toDate(solarNoonLocal - sunriseHA),
+    dhuhr: toDate(solarNoonLocal),
+    asr: toDate(solarNoonLocal + asrHA),
+    maghrib: toDate(solarNoonLocal + sunriseHA),
+    isha: toDate(solarNoonLocal + ishaHA)
+  };
+}
+
+function loadPrayerTimes() {
+  if (!userCoords) {
+    try {
+      const saved = localStorage.getItem('cal_user_coords');
+      if (saved) userCoords = JSON.parse(saved);
+    } catch (e) {}
+  }
+  if (!userCoords) {
+    document.getElementById('prayerCityName').textContent = '🕌 جاري تحديد الموقع...';
+    return;
+  }
+
+  try {
+    const times = calculatePrayerTimes(userCoords.lat, userCoords.lng, new Date());
+    renderPrayerTimes(times);
+  } catch (e) {
+    console.error(e);
+    showToast('⚠️ فشل حساب المواقيت');
+  }
+}
+
+function renderPrayerTimes(times) {
+  const prayers = [
+    { id: 'fajr', name: 'الفجر', icon: '🌅', time: times.fajr, cls: 'fajr' },
+    { id: 'sunrise', name: 'الشروق', icon: '☀️', time: times.sunrise, cls: 'sunrise' },
+    { id: 'dhuhr', name: 'الظهر', icon: '🌞', time: times.dhuhr, cls: 'dhuhr' },
+    { id: 'asr', name: 'العصر', icon: '🌤️', time: times.asr, cls: 'asr' },
+    { id: 'maghrib', name: 'المغرب', icon: '🌇', time: times.maghrib, cls: 'maghrib' },
+    { id: 'isha', name: 'العشاء', icon: '🌙', time: times.isha, cls: 'isha' }
+  ];
+
+  // الصلاة القادمة
+  const now = new Date();
+  let nextId = null;
+  for (const p of prayers) {
+    if (p.time > now) { nextId = p.id; break; }
+  }
+  if (!nextId) nextId = 'fajr';
+
+  const dateStr = now.toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  const hijri = getHijriDate(now);
+
+  document.getElementById('prayerCityName').textContent = `🕌 ${userCityName}`;
+  document.getElementById('prayerDateDisplay').textContent = `${dateStr} · ${hijri}`;
+
+  const cardsEl = document.getElementById('prayerCards');
+  cardsEl.innerHTML = '';
+  prayers.forEach(p => {
+    const isNext = p.id === nextId;
+    const timeStr = p.time.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+    const card = document.createElement('div');
+    card.className = 'prayer-card' + (isNext ? ' next' : '');
+    card.dataset.prayerId = p.id;
+    card.dataset.prayerTime = p.time.getTime();
+    card.innerHTML = `
+      <div class="prayer-icon ${p.cls}">${p.icon}</div>
+      <div class="prayer-info">
+        <div class="prayer-name">${p.name}</div>
+        <div class="prayer-time">${timeStr}</div>
+        <div class="prayer-remaining" data-prayer-remaining="${p.id}"></div>
+      </div>
+    `;
+    cardsEl.appendChild(card);
+  });
+  updatePrayerCountdown();
+}
+
+function updatePrayerCountdown() {
+  const cards = document.querySelectorAll('.prayer-card[data-prayer-time]');
+  const now = Date.now();
+  cards.forEach(card => {
+    const t = parseInt(card.dataset.prayerTime);
+    const id = card.dataset.prayerId;
+    const remaining = t - now;
+    const el = card.querySelector(`[data-prayer-remaining="${id}"]`);
+    if (!el) return;
+    if (remaining > 0) {
+      const hh = Math.floor(remaining / 3600000);
+      const mm = Math.floor((remaining % 3600000) / 60000);
+      const ss = Math.floor((remaining % 60000) / 1000);
+      el.textContent = `بعد ${hh}:${String(mm).padStart(2, '0')}:${String(ss).padStart(2, '0')}`;
+    } else {
+      el.textContent = 'انتهى';
+    }
+  });
+}
+
+// ============================================
+// الليل والنهار
+// ============================================
+function updateSkyDiagram(now) {
+  const h = now.getHours() + now.getMinutes() / 60;
+  let sunP = (h >= 6 && h <= 18) ? (h - 6) / 12 : -1;
+  let moonP;
+  if (h >= 18 || h < 6) {
+    const hh = h >= 18 ? h - 18 : h + 6;
+    moonP = hh / 12;
+  } else moonP = -1;
+
+  const sunOrb = document.getElementById('sunOrb');
+  const moonOrb = document.getElementById('moonOrb');
+  if (sunP >= 0) {
+    const x = 10 + sunP * 80;
+    const y = 15 + Math.sin(sunP * Math.PI) * 55;
+    sunOrb.style.left = x + '%';
+    sunOrb.style.top = (100 - y) + '%';
+    sunOrb.style.display = 'block';
+  } else sunOrb.style.display = 'none';
+  if (moonP >= 0) {
+    const x = 10 + moonP * 80;
+    const y = 15 + Math.sin(moonP * Math.PI) * 50;
+    moonOrb.style.left = x + '%';
+    moonOrb.style.top = (100 - y) + '%';
+    moonOrb.style.display = 'block';
+  } else moonOrb.style.display = 'none';
+
+  const a = calculateAstroEvents(userCoords ? userCoords.lat : 30.04);
+  document.getElementById('daynightInfo').innerHTML = `
+    <div class="info-card"><div class="info-icon sunrise">🌅</div><div class="info-content"><div class="info-label">شروق الشمس</div><div class="info-value">${a.sunrise}</div></div></div>
+    <div class="info-card"><div class="info-icon sunset">🌇</div><div class="info-content"><div class="info-label">غروب الشمس</div><div class="info-value">${a.sunset}</div></div></div>
+    <div class="info-card"><div class="info-icon day-length">☀️</div><div class="info-content"><div class="info-label">طول النهار</div><div class="info-value">${a.dayLength}</div></div></div>
+    <div class="info-card"><div class="info-icon night-length">🌙</div><div class="info-content"><div class="info-label">طول الليل</div><div class="info-value">${a.nightLength}</div></div></div>
+  `;
+}
+
+// ============================================
+// الأرشيف — تقويم شهري + بحث سريع
+// ============================================
+function renderArchiveCalendar() {
+  const year = archiveViewYear;
+  const month = archiveViewMonth;
+  const monthNames = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  document.getElementById('archiveMonthTitle').textContent = `${monthNames[month]} ${year}`;
+
+  const wd = document.getElementById('archiveWeekdays');
+  wd.innerHTML = '';
+  const weekdays = ['أحد','إثنين','ثلاثاء','أربعاء','خميس','جمعة','سبت'];
+  weekdays.forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'cal-weekday';
+    el.textContent = d;
+    wd.appendChild(el);
+  });
+
+  const grid = document.getElementById('archiveCalGrid');
+  grid.innerHTML = '';
+
+  const firstDay = new Date(year, month, 1);
+  const startOffset = firstDay.getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  for (let i = 0; i < startOffset; i++) {
+    const e = document.createElement('div');
+    e.className = 'cal-day empty';
+    grid.appendChild(e);
+  }
+
+  const today = new Date();
+  const todayStr = dateKey(today);
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dateObj = new Date(year, month, day);
+    const dk = dateKey(dateObj);
+    const hijriDay = getHijriDayOnly(dateObj);
+    const hasNote = notes[dk] && (
+      (notes[dk].dayNote && notes[dk].dayNote.trim()) ||
+      (notes[dk].nightNote && notes[dk].nightNote.trim()) ||
+      (notes[dk].hours && Object.values(notes[dk].hours).some(v => v && v.trim()))
+    );
+
+    const btn = document.createElement('button');
+    btn.className = 'cal-day';
+    if (dk === todayStr) btn.classList.add('today');
+    if (dk === archiveSelectedDate) btn.classList.add('selected');
+    btn.innerHTML = `
+      <span class="day-num">${day}</span>
+      <span class="day-hijri">${hijriDay || ''}</span>
+      ${hasNote ? '<span class="day-dot"></span>' : ''}
+    `;
+    btn.onclick = () => selectArchiveDay(dk);
+    grid.appendChild(btn);
+  }
+}
+
+function archiveChangeMonth(delta) {
+  archiveViewMonth += delta;
+  if (archiveViewMonth > 11) { archiveViewMonth = 0; archiveViewYear++; }
+  if (archiveViewMonth < 0) { archiveViewMonth = 11; archiveViewYear--; }
+  renderArchiveCalendar();
+}
+function archiveChangeYear(delta) {
+  archiveViewYear += delta;
+  renderArchiveCalendar();
+}
+function archiveGoToday() {
+  const t = new Date();
+  archiveViewYear = t.getFullYear();
+  archiveViewMonth = t.getMonth();
+  archiveSelectedDate = dateKey(t);
+  renderArchiveCalendar();
+  showArchiveDetails();
+  showToast('📅 تم الانتقال لليوم');
+}
+
+// ============================================
+// البحث السريع في الأرشيف
+// ============================================
+function archiveDoSearch() {
+  const textQuery = document.getElementById('archiveQuickSearch').value.trim();
+  const dayVal = document.getElementById('archiveDaySearch').value;
+  const monthVal = document.getElementById('archiveMonthSearch').value;
+  const yearVal = document.getElementById('archiveYearSearch').value;
+
+  // 1) بحث بالتاريخ الكامل (YYYY-MM-DD)
+  if (textQuery && /^\d{4}-\d{1,2}-\d{1,2}$/.test(textQuery)) {
+    const parts = textQuery.split('-');
+    archiveJumpToDate(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+    return;
+  }
+
+  // 2) بحث بالسنة فقط (2025)
+  if (textQuery && /^\d{4}$/.test(textQuery)) {
+    archiveViewYear = parseInt(textQuery);
+    renderArchiveCalendar();
+    showToast(`📅 تم الانتقال لسنة ${archiveViewYear}`);
+    return;
+  }
+
+  // 3) بحث بالشهر/السنة (2025-05 أو 05-2025)
+  if (textQuery && /^\d{4}-\d{1,2}$/.test(textQuery)) {
+    const parts = textQuery.split('-');
+    archiveViewYear = parseInt(parts[0]);
+    archiveViewMonth = parseInt(parts[1]) - 1;
+    renderArchiveCalendar();
+    showToast(`📅 ${document.getElementById('archiveMonthTitle').textContent}`);
+    return;
+  }
+
+  // 4) بحث بالحقول المخصصة
+  let year = yearVal ? parseInt(yearVal) : archiveViewYear;
+  let month = monthVal !== '' ? parseInt(monthVal) : archiveViewMonth;
+  let day = dayVal ? parseInt(dayVal) : null;
+
+  if (day) {
+    archiveJumpToDate(year, month, day);
+  } else {
+    archiveViewYear = year;
+    archiveViewMonth = month;
+    renderArchiveCalendar();
+    showToast(`📅 ${document.getElementById('archiveMonthTitle').textContent}`);
+  }
+}
+
+function archiveJumpToDate(year, month, day) {
+  if (month < 0 || month > 11) { showToast('⚠️ الشهر غير صحيح'); return; }
+  const date = new Date(year, month, day);
+  if (date.getMonth() !== month) { showToast('⚠️ التاريخ غير صحيح'); return; }
+  archiveViewYear = year;
+  archiveViewMonth = month;
+  archiveSelectedDate = dateKey(date);
+  renderArchiveCalendar();
+  showArchiveDetails();
+  showToast(`📅 ${date.toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`);
+}
+
+function archiveQuickJump(days) {
+  const base = archiveSelectedDate ? new Date(archiveSelectedDate) : new Date();
+  base.setDate(base.getDate() + days);
+  archiveViewYear = base.getFullYear();
+  archiveViewMonth = base.getMonth();
+  archiveSelectedDate = dateKey(base);
+  renderArchiveCalendar();
+  showArchiveDetails();
+  showToast(`📅 ${base.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' })}`);
+}
+
+function selectArchiveDay(dk) {
+  archiveSelectedDate = dk;
+  renderArchiveCalendar();
+  showArchiveDetails();
+}
+
+function showArchiveDetails() {
+  const panel = document.getElementById('archiveDetailPanel');
+  if (!archiveSelectedDate) {
+    panel.innerHTML = `<div class="archive-no-selection"><span class="ans-icon">📅</span>اضغط على أي يوم لعرض تفاصيله وإضافة ملاحظة</div>`;
+    return;
+  }
+
+  const d = new Date(archiveSelectedDate);
+  const dayName = d.toLocaleDateString('ar-EG', { weekday: 'long' });
+  const dateFull = d.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
+  const hijri = getHijriDate(d);
+  const coptic = getCopticDate(d);
+  const a = calculateAstroEventsForDate(d);
+  const dayData = notes[archiveSelectedDate] || { dayNote: '', nightNote: '', hours: {} };
+
+  let allNotes = [];
+  if (dayData.hours) {
+    Object.keys(dayData.hours).sort((a, b) => parseInt(a) - parseInt(b)).forEach(h => {
+      if (dayData.hours[h] && dayData.hours[h].trim()) {
+        allNotes.push(`[${formatHour12(parseInt(h))}] ${dayData.hours[h]}`);
+      }
+    });
+  }
+  if (dayData.dayNote && dayData.dayNote.trim()) allNotes.unshift(`☀️ ملاحظة نهارية: ${dayData.dayNote}`);
+  if (dayData.nightNote && dayData.nightNote.trim()) allNotes.push(`🌙 ملاحظة ليلية: ${dayData.nightNote}`);
+
+  panel.innerHTML = `
+    <div class="archive-day-title">📅 ${dayName}</div>
+    <div class="archive-day-sub">${dateFull}</div>
+
+    <div class="archive-info-grid">
+      <div class="archive-info-box full">
+        <div class="aib-label">🌙 التاريخ الهجري</div>
+        <div class="aib-value" style="text-align: right; direction: rtl;">${hijri || '—'}</div>
+      </div>
+      <div class="archive-info-box full">
+        <div class="aib-label">🏛️ التقويم القبطي</div>
+        <div class="aib-value" style="text-align: right; direction: rtl;">${coptic}</div>
+      </div>
+      <div class="archive-info-box">
+        <div class="aib-label">🌅 شروق</div>
+        <div class="aib-value">${a.sunrise}</div>
+      </div>
+      <div class="archive-info-box">
+        <div class="aib-label">🌇 غروب</div>
+        <div class="aib-value">${a.sunset}</div>
+      </div>
+      <div class="archive-info-box">
+        <div class="aib-label">⏱️ طول النهار</div>
+        <div class="aib-value">${a.dayLength}</div>
+      </div>
+      <div class="archive-info-box">
+        <div class="aib-label">🌕 القمر</div>
+        <div class="aib-value" style="text-align: right; direction: rtl;">${a.moonPhaseName}</div>
+      </div>
+    </div>
+
+    <div class="archive-note-section">
+      <div class="archive-note-label">
+        <span>📝 ملاحظات هذا اليوم</span>
+        <span class="archive-note-saved" id="archiveNoteSaved">✓ تم الحفظ</span>
+      </div>
+      <textarea class="archive-note-input" id="archiveNoteInput" placeholder="اكتب ملاحظتك عن هذا اليوم...">${escapeHtml(allNotes.join('\n'))}</textarea>
+      <div class="archive-actions">
+        <button class="btn btn-primary" onclick="saveArchiveNote()">💾 حفظ</button>
+        <button class="btn btn-secondary" onclick="openArchiveDayInCalendar()">📖 فتح في التقويم</button>
+      </div>
+    </div>
+  `;
+}
+
+function saveArchiveNote() {
+  if (!archiveSelectedDate) return;
+  const val = document.getElementById('archiveNoteInput').value;
+  if (!notes[archiveSelectedDate]) notes[archiveSelectedDate] = { dayNote: '', nightNote: '', hours: {} };
+  notes[archiveSelectedDate].dayNote = val;
+  saveNotes();
+
+  const saved = document.getElementById('archiveNoteSaved');
+  saved.classList.add('show');
+  setTimeout(() => saved.classList.remove('show'), 2000);
+
+  renderArchiveCalendar();
+  showToast('💾 تم حفظ الملاحظة');
+}
+
+function openArchiveDayInCalendar() {
+  if (!archiveSelectedDate) return;
+  currentDate = new Date(archiveSelectedDate);
+  saveCurrentDate();
+  switchTab('calendar');
+  renderCalendar();
+  showToast('📖 تم فتح اليوم في التقويم');
+}
+
+function getCopticDate(date) {
+  const m = date.getMonth() + 1;
+  const day = date.getDate();
+  for (let i = 0; i < AGRI_MONTHS.length; i++) {
+    const mn = AGRI_MONTHS[i];
+    if (isInAgriMonth(m, day, mn.start, mn.end)) return `${mn.name} (${mn.season})`;
+  }
+  return '—';
+}
+
+function calculateAstroEventsForDate(date) {
+  const dayOfYear = Math.floor((date - new Date(date.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
+  const dec = 23.44 * Math.sin((360 / 365) * (dayOfYear - 81) * Math.PI / 180);
+  const lat = userCoords ? userCoords.lat : 30.04;
+  const latRad = lat * Math.PI / 180;
+  const decRad = dec * Math.PI / 180;
+  const ha = Math.acos(-Math.tan(latRad) * Math.tan(decRad)) * 180 / Math.PI;
+  const dayLength = (ha * 2) / 15;
+  const sunrise = 12 - dayLength / 2;
+  const sunset = 12 + dayLength / 2;
+  const lunarCycle = 29.53059;
+  const knownNewMoon = new Date('2000-01-06T18:14:00Z');
+  const daysSinceNew = (date - knownNewMoon) / (1000 * 60 * 60 * 24);
+  const moonPhase = ((daysSinceNew % lunarCycle) + lunarCycle) % lunarCycle;
+  return {
+    sunrise: formatDecimalHour(sunrise),
+    sunset: formatDecimalHour(sunset),
+    dayLength: formatDuration(dayLength),
+    moonPhaseName: getMoonPhaseName(moonPhase)
+  };
+}
+
+// ============================================
+// البحث العام
+// ============================================
+function performSearch(query) {
+  const resultsEl = document.getElementById('searchResults');
+  query = query.trim();
+  if (!query) { resultsEl.classList.remove('show'); return; }
+  const q = query.toLowerCase();
+  const results = [];
+  Object.keys(notes).forEach(dateK => {
+    const dayData = notes[dateK];
+    if (dayData.dayNote && dayData.dayNote.toLowerCase().includes(q)) {
+      results.push({ type: 'note', date: dateK, icon: '📝', title: dayData.dayNote.substring(0, 80), meta: `ملاحظة نهارية — ${dateK}` });
+    }
+    if (dayData.nightNote && dayData.nightNote.toLowerCase().includes(q)) {
+      results.push({ type: 'note', date: dateK, icon: '📝', title: dayData.nightNote.substring(0, 80), meta: `ملاحظة ليلية — ${dateK}` });
+    }
+    if (dayData.hours) {
+      Object.keys(dayData.hours).forEach(h => {
+        const v = dayData.hours[h];
+        if (v && v.toLowerCase().includes(q)) {
+          results.push({ type: 'note', date: dateK, icon: '⏰', title: v.substring(0, 80), meta: `الساعة ${formatHour12(parseInt(h))} — ${dateK}` });
+        }
+      });
+    }
+  });
+  birthdays.forEach(b => {
+    if (b.name.toLowerCase().includes(q) || (b.note && b.note.toLowerCase().includes(q))) {
+      results.push({ type: 'birthday', id: b.id, icon: '🎂', title: b.name, meta: `تاريخ الميلاد: ${new Date(b.date).toLocaleDateString('ar-EG')}${b.note ? ' — ' + b.note : ''}` });
+    }
+  });
+  if (results.length === 0) {
+    resultsEl.innerHTML = '<div class="search-empty">لا توجد نتائج</div>';
+  } else {
+    resultsEl.innerHTML = results.slice(0, 30).map(r => `
+      <div class="search-result-item" onclick="clickSearchResult('${r.type}', '${r.date || ''}', '${r.id || ''}')">
+        <div class="sr-title">${r.icon} ${escapeHtml(r.title)}</div>
+        <div class="sr-meta">
+          <span class="sr-type ${r.type}">${r.type === 'note' ? 'ملاحظة' : 'ميلاد'}</span>
+          ${escapeHtml(r.meta)}
+        </div>
+      </div>
+    `).join('');
+  }
+  resultsEl.classList.add('show');
+}
+function clickSearchResult(type, date, id) {
+  document.getElementById('searchResults').classList.remove('show');
+  document.getElementById('searchInput').value = '';
+  if (type === 'note' && date) {
+    currentDate = new Date(date);
+    saveCurrentDate();
+    switchTab('calendar');
+    renderCalendar();
+    showToast('📅 تم الانتقال للتاريخ');
+  } else if (type === 'birthday') {
+    switchTab('birthdays');
+  }
+}
+
+// ============================================
+// التبويبات
+// ============================================
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.toggle('active', p.id === 'tab-' + tab));
+  if (tab === 'birthdays') renderBirthdays();
+  if (tab === 'agri') renderAgri();
+  if (tab === 'astro') renderAstro();
+  if (tab === 'daynight') updateSkyDiagram(new Date());
+  if (tab === 'prayer') {
+    if (!userCoords) requestLocation();
+    else loadPrayerTimes();
+  }
+  if (tab === 'archive') renderArchiveCalendar();
+}
+
+// ============================================
+// المظهر
+// ============================================
+function toggleTheme() {
+  isDarkMode = !isDarkMode;
+  document.body.classList.toggle('dark-mode', isDarkMode);
+  document.getElementById('themeBtn').textContent = isDarkMode ? '☀️' : '🌙';
+  localStorage.setItem('cal_theme', isDarkMode ? 'dark' : 'light');
+}
+
+// ============================================
+// التنزيل
+// ============================================
+function getCurrentContent() {
+  if (currentTab === 'calendar') return buildCalendarText();
+  if (currentTab === 'birthdays') return buildBirthdaysText();
+  if (currentTab === 'agri') return buildAgriText();
+  if (currentTab === 'astro') return buildAstroText();
+  if (currentTab === 'prayer') return buildPrayerText();
+  if (currentTab === 'archive') return buildArchiveText();
+  return buildDayNightText();
+}
+function buildCalendarText() {
+  const dayKey = dateKey(currentDate);
+  const d = notes[dayKey] || { dayNote: '', nightNote: '', hours: {} };
+  const dateStr = currentDate.toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  let t = `📅 تقويم AhmdSchool\n${'='.repeat(40)}\n\n📆 ${dateStr}\n\n🌙 ${getHijriDate(currentDate)}\n\n`;
+  t += `───── ☀️ ساعات النهار ─────\n\n`;
+  for (let h = 6; h < 18; h++) t += `[${formatHour12(h)}] ${(d.hours && d.hours[h]) || '(فارغ)'}\n`;
+  t += `\n───── 🌙 ساعات الليل ─────\n\n`;
+  for (let h = 18; h < 24; h++) t += `[${formatHour12(h)}] ${(d.hours && d.hours[h]) || '(فارغ)'}\n`;
+  for (let h = 0; h < 6; h++) t += `[${formatHour12(h)}] ${(d.hours && d.hours[h]) || '(فارغ)'}\n`;
+  if (d.dayNote) t += `\n📝 ملاحظات النهار: ${d.dayNote}\n`;
+  if (d.nightNote) t += `\n📝 ملاحظات الليل: ${d.nightNote}\n`;
+  t += `\n${'='.repeat(40)}\n© 2025 AhmdSchool\nopenlibrary@collector.org\n`;
+  return t;
+}
+function buildBirthdaysText() {
+  let t = `🎂 تواريخ الميلاد\n${'='.repeat(40)}\n\n`;
+  if (birthdays.length === 0) t += '(لا توجد تواريخ)\n';
+  else birthdays.forEach((b, i) => {
+    const bd = new Date(b.date);
+    t += `${i + 1}. ${b.name}\n   📅 ${bd.toLocaleDateString('ar-EG')}\n`;
+    if (b.note) t += `   📝 ${b.note}\n`;
+    t += '\n';
+  });
+  t += `${'='.repeat(40)}\n© 2025 AhmdSchool\n`;
+  return t;
+}
+function buildAgriText() {
+  const today = new Date();
+  const m = today.getMonth() + 1;
+  const d = today.getDate();
+  let t = `🌾 التقويم الزراعي المصري\n${'='.repeat(40)}\n\n`;
+  AGRI_MONTHS.forEach(mn => {
+    const inMonth = isInAgriMonth(m, d, mn.start, mn.end);
+    t += `${mn.emoji} ${mn.name} ${inMonth ? '📌 (أنت هنا)' : ''}\n`;
+    t += `   الفترة: ${mn.start[1]}/${mn.start[0]} → ${mn.end[1]}/${mn.end[0]}\n`;
+    t += `   الموسم: ${mn.season}\n   المحاصيل: ${mn.crops.join('، ')}\n   ${mn.desc}\n\n`;
+  });
+  t += `${'='.repeat(40)}\n© 2025 AhmdSchool\n`;
+  return t;
+}
+function buildAstroText() {
+  const a = calculateAstroEvents(userCoords ? userCoords.lat : 30.04);
+  let t = `🔭 الأحداث الفلكية اليوم\n${'='.repeat(40)}\n\n`;
+  t += `🌅 شروق الشمس: ${a.sunrise}\n🌇 غروب الشمس: ${a.sunset}\n☀️ الزوال: ${a.solarNoon}\n`;
+  t += `⏱️ طول النهار: ${a.dayLength}\n🌙 طول الليل: ${a.nightLength}\n🌕 القمر: ${a.moonPhaseName}\n`;
+  t += `💡 إضاءة القمر: ${a.moonIllumination}%\n📐 ميل الشمس: ${a.declination}°\n`;
+  t += `\n${'='.repeat(40)}\n© 2025 AhmdSchool\n`;
+  return t;
+}
+function buildPrayerText() {
+  let t = `🕌 مواقيت الصلاة\n${'='.repeat(40)}\n\n`;
+  t += `📍 ${userCityName}\n`;
+  const dateDis = document.getElementById('prayerDateDisplay')?.textContent || '';
+  t += `${dateDis}\n\n`;
+  const cards = document.querySelectorAll('#prayerCards .prayer-card');
+  cards.forEach(c => {
+    const name = c.querySelector('.prayer-name')?.textContent || '';
+    const time = c.querySelector('.prayer-time')?.textContent || '';
+    t += `🕌 ${name}: ${time}\n`;
+  });
+  t += `\n${'='.repeat(40)}\n© 2025 AhmdSchool\n`;
+  return t;
+}
+function buildArchiveText() {
+  if (!archiveSelectedDate) return '📜 الأرشيف — لم يتم اختيار يوم';
+  const d = new Date(archiveSelectedDate);
+  const dayName = d.toLocaleDateString('ar-EG', { weekday: 'long' });
+  const dateFull = d.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
+  const hijri = getHijriDate(d);
+  const coptic = getCopticDate(d);
+  const a = calculateAstroEventsForDate(d);
+  let t = `📜 الأرشيف — ${dayName}\n${'='.repeat(40)}\n\n`;
+  t += `📅 التاريخ: ${dateFull}\n🌙 الهجري: ${hijri}\n🏛️ القبطي: ${coptic}\n\n`;
+  t += `🌅 شروق: ${a.sunrise}\n🌇 غروب: ${a.sunset}\n⏱️ طول النهار: ${a.dayLength}\n🌕 القمر: ${a.moonPhaseName}\n`;
+  t += `\n${'='.repeat(40)}\n© 2025 AhmdSchool\n`;
+  return t;
+}
+function buildDayNightText() {
+  const a = calculateAstroEvents(userCoords ? userCoords.lat : 30.04);
+  return `🌗 الليل والنهار\n${'='.repeat(40)}\n\n☀️ طول النهار: ${a.dayLength}\n🌙 طول الليل: ${a.nightLength}\n🌅 شروق: ${a.sunrise}\n🌇 غروب: ${a.sunset}\n🌕 القمر: ${a.moonPhaseName}\n\n${'='.repeat(40)}\n© 2025 AhmdSchool\n`;
+}
+function getCurrentHtml() {
+  const tab = currentTab;
+  const target = document.querySelector(`#tab-${tab}`);
+  const clone = target.cloneNode(true);
+  clone.querySelectorAll('button').forEach(b => b.remove());
+  return `<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>تقويم AhmdSchool</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700;900&family=Cairo:wght@400;600;700;900&family=Reem+Kufi:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+body{font-family:Cairo,sans-serif;background:#f5efe0;color:#2a2118;padding:30px;direction:rtl}
+h1{color:#8a6b3a;font-family:Amiri,serif;text-align:center;margin-bottom:25px}
+.card-panel,.calendar-book,.daynight-layout,.archive-calendar-panel,.archive-detail-panel{background:white;border-radius:16px;padding:25px;margin-bottom:20px;box-shadow:0 10px 30px rgba(0,0,0,.1);border:1px solid #e8e0cc}
+.footer-brand{text-align:center;padding:25px;color:#8a6b3a;font-family:Amiri,serif;font-weight:700;border-top:2px solid #b8945f;margin-top:30px}
+</style></head><body><h1>📅 تقويم AhmdSchool</h1>${clone.outerHTML}
+<div class="footer-brand">📅 تقويم AhmdSchool — © 2025 AhmdSchool — openlibrary@collector.org</div></body></html>`;
+}
+function downloadAs(format) {
+  const dateStr = new Date().toISOString().slice(0, 10);
+  const fn = `AhmdSchool_${currentTab}_${dateStr}`;
+  if (format === 'txt') {
+    const blob = new Blob([getCurrentContent()], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = fn + '.txt'; a.click();
+    URL.revokeObjectURL(url); showToast('📝 تم تنزيل TXT');
+  } else if (format === 'html') {
+    const blob = new Blob([getCurrentHtml()], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = fn + '.html'; a.click();
+    URL.revokeObjectURL(url); showToast('🌐 تم تنزيل HTML');
+  } else if (format === 'pdf') downloadPDF(fn);
+  else if (format === 'png') downloadPNG(fn);
+}
+async function downloadPDF(fn) {
+  try {
+    const { jsPDF } = window.jspdf;
+    const target = document.querySelector(`#tab-${currentTab}`);
+    showToast('⏳ جاري إنشاء PDF...');
+    const canvas = await html2canvas(target, { backgroundColor: '#f5efe0', scale: 1.5, useCORS: true });
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pw = pdf.internal.pageSize.getWidth();
+    const ph = pdf.internal.pageSize.getHeight();
+    const ih = (canvas.height * pw) / canvas.width;
+    let hl = ih, pos = 0;
+    pdf.addImage(imgData, 'PNG', 0, pos, pw, ih);
+    hl -= ph;
+    while (hl >= 0) { pos = hl - ih; pdf.addPage(); pdf.addImage(imgData, 'PNG', 0, pos, pw, ih); hl -= ph; }
+    const pages = pdf.internal.getNumberOfPages();
+    for (let i = 1; i <= pages; i++) {
+      pdf.setPage(i); pdf.setFontSize(8); pdf.setTextColor(184, 148, 95);
+      pdf.text('© 2025 AhmdSchool — openlibrary@collector.org', pw / 2, ph - 5, { align: 'center' });
+    }
+    pdf.save(fn + '.pdf'); showToast('📄 تم تنزيل PDF');
+  } catch (e) { console.error(e); showToast('⚠️ فشل'); }
+}
+async function downloadPNG(fn) {
+  try {
+    showToast('⏳ جاري إنشاء الصورة...');
+    const target = document.querySelector(`#tab-${currentTab}`);
+    const canvas = await html2canvas(target, { backgroundColor: '#f5efe0', scale: 2, useCORS: true });
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = 'rgba(184,148,95,0.9)'; ctx.font = 'bold 16px Cairo, sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('© 2025 AhmdSchool — openlibrary@collector.org', canvas.width / 2, canvas.height - 20);
+    const url = canvas.toDataURL('image/png');
+    const a = document.createElement('a'); a.href = url; a.download = fn + '.png'; a.click();
+    showToast('🖼️ تم التنزيل');
+  } catch (e) { console.error(e); showToast('⚠️ فشل'); }
+}
+
+// ============================================
+// مستمعي الأحداث
+// ============================================
+document.getElementById('searchInput').addEventListener('input', e => performSearch(e.target.value));
+document.getElementById('searchInput').addEventListener('focus', e => { if (e.target.value.trim()) performSearch(e.target.value); });
+document.addEventListener('click', e => {
+  const wrap = document.querySelector('.search-wrap');
+  const results = document.getElementById('searchResults');
+  if (!wrap.contains(e.target) && !results.contains(e.target)) results.classList.remove('show');
+});
+
+// ============================================
+// التهيئة
+// ============================================
+function init() {
+  if (localStorage.getItem('cal_theme') === 'dark') {
+    isDarkMode = true;
+    document.body.classList.add('dark-mode');
+    document.getElementById('themeBtn').textContent = '☀️';
+  }
+  const savedDate = localStorage.getItem('cal_current_date');
+  if (savedDate) { try { currentDate = new Date(savedDate); } catch (e) {} }
+  loadNotes();
+  loadBirthdays();
+
+  try {
+    const savedCoords = localStorage.getItem('cal_user_coords');
+    if (savedCoords) {
+      userCoords = JSON.parse(savedCoords);
+      document.getElementById('prayerLocationStatus').textContent = `✅ موقع محفوظ (${userCoords.lat.toFixed(2)}, ${userCoords.lng.toFixed(2)})`;
+      document.getElementById('prayerLocationStatus').className = 'auto-location-status granted';
+      reverseGeocode(userCoords);
+    }
+  } catch (e) {}
+
+  renderCalendar();
+  renderBirthdays();
+  updateClock();
+  setInterval(updateClock, 1000);
+  setInterval(() => { if (currentTab === 'calendar') renderCalendar(); }, 60000);
+  setInterval(() => { if (currentTab === 'daynight') updateSkyDiagram(new Date()); }, 30000);
+
+  setTimeout(() => {
+    if (!userCoords) requestLocation();
+    else loadPrayerTimes();
+  }, 500);
+
+  archiveSelectedDate = dateKey(new Date());
+  renderArchiveCalendar();
+
+  console.log('📅 تقويم AhmdSchool جاهز — كل التبويبات تعمل أوفلاين');
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else init();
+</script>
+</body>
+</html>
